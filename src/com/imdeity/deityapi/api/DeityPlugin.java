@@ -23,6 +23,7 @@ public abstract class DeityPlugin extends JavaPlugin {
     
     public DeityPluginChat chat = null;
     public DeityPluginConfig config = null;
+    public DeityPluginLanguage language = null;
     private ArrayList<Integer> taskList = new ArrayList<Integer>();
     public ArrayList<DeityListener> listeners = new ArrayList<DeityListener>();
     public ArrayList<DeityCommandHandler> commands = new ArrayList<DeityCommandHandler>();
@@ -36,9 +37,12 @@ public abstract class DeityPlugin extends JavaPlugin {
             long startTime = System.currentTimeMillis();
             chat = new DeityPluginChat(getDescription().getName());
             config = new DeityPluginConfig(getDescription().getName(), this.getConfig(), "plugins/" + getDescription().getName() + "/config.yml");
-            
+            language = new DeityPluginLanguage(getDescription().getName(), this.getConfig(), "plugins/" + getDescription().getName() + "/language.yml");
             initConfig();
             config.saveConfig();
+            initLanguage();
+            language.save();
+            
             initDatabase();
             initCmds();
             initListeners();
@@ -51,9 +55,12 @@ public abstract class DeityPlugin extends JavaPlugin {
         } else {
             chat = new DeityPluginChat(getDescription().getName());
             config = new DeityPluginConfig(getDescription().getName(), this.getConfig(), "plugins/" + getDescription().getName() + "/config.yml");
-            
+            language = new DeityPluginLanguage(getDescription().getName(), this.getConfig(), "plugins/" + getDescription().getName() + "/language.yml");
             initConfig();
             config.saveConfig();
+            initLanguage();
+            language.save();
+            
             initDatabase();
             initCmds();
             initListeners();
@@ -82,28 +89,33 @@ public abstract class DeityPlugin extends JavaPlugin {
     protected abstract void initConfig();
     
     /**
-     * Fourth init called. Initializes all DeityCommandHandler's
+     * Third init called. Initializes the language with default nodes
+     */
+    protected abstract void initLanguage();
+    
+    /**
+     * Fifth init called. Initializes all DeityCommandHandler's
      */
     protected abstract void initCmds();
     
     /**
-     * Third init called. Initializes any database tables or startup info
+     * Fourth init called. Initializes any database tables or startup info
      */
     protected abstract void initDatabase();
     
     /**
-     * Seventh init called. Initializes any further internal data-members if
-     * they are otherwise un-initialized
+     * Eighth init called. Initializes any further internal data-members if they
+     * are otherwise un-initialized
      */
     protected abstract void initInternalDatamembers();
     
     /**
-     * Fifth init called. Initializes all DeityListener's
+     * Sixth init called. Initializes all DeityListener's
      */
     protected abstract void initListeners();
     
     /**
-     * Sixth init called. Initializes all tasks
+     * Seventh init called. Initializes all tasks
      */
     protected abstract void initTasks();
     
@@ -224,6 +236,78 @@ public abstract class DeityPlugin extends JavaPlugin {
         public void set(String node, Object value) {
             config.set(node, value);
             this.saveConfig();
+        }
+    }
+    
+    /**
+     * Language class
+     * 
+     * @author vanZeben
+     */
+    public class DeityPluginLanguage {
+        private FileConfiguration language = null;
+        private File saveFile = null;
+        private String pluginName;
+        
+        /**
+         * Initializes the language from the main file
+         * 
+         * @param pluginName
+         * @param language
+         * @param saveLocation
+         */
+        public DeityPluginLanguage(String pluginName, FileConfiguration language, String saveLocation) {
+            this.pluginName = pluginName;
+            Logger.getLogger("Minecraft").info("[" + pluginName + "] Loading Language...");
+            this.language = language;
+            saveFile = new File(saveLocation);
+        }
+        
+        /**
+         * Saves the langauge to the file passed in the constructor
+         */
+        public void save() {
+            Logger.getLogger("Minecraft").info("[" + pluginName + "] Saving Language...");
+            try {
+                language.save(saveFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        /**
+         * To be called in the DeityPlugin initLanguage function. Initializes
+         * all default language values
+         * 
+         * @param path
+         * @param value
+         */
+        public void addDefaultLanguageValue(String path, String value) {
+            if (!language.contains(path)) {
+                language.set(path, value);
+            }
+        }
+        
+        /**
+         * Returns a language node
+         * 
+         * @param node
+         * @return
+         */
+        public String getNode(String node) {
+            if (language.contains(node)) { return language.getString(node); }
+            return null;
+        }
+        
+        /**
+         * Saves a language node
+         * 
+         * @param node
+         * @param value
+         */
+        public void setNode(String node, String value) {
+            language.set(node, value);
+            this.save();
         }
     }
     

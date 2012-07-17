@@ -38,7 +38,7 @@ public abstract class DeityCommandHandler implements CommandExecutor {
         for (String cs : commandNames) {
             if (!cs.equalsIgnoreCase("")) {
                 if (cs.equalsIgnoreCase("help")) {
-                    helpOutput.add(PAGE_FORMAT.replaceAll("%command%", this.getName().toLowerCase()).replaceAll("%subCommand%", "help").replaceAll("%arguments%", "").replaceAll("%description%", "Shows the help files"));
+                    helpOutput.add(PAGE_FORMAT.replaceAll("%command%", this.getName().toLowerCase()).replaceAll("%subCommand%", "help").replaceAll("%arguments%", "<page-number>").replaceAll("%description%", "Shows the help files"));
                     continue;
                 }
                 for (String s : commandArguments.get(cs)) {

@@ -61,6 +61,10 @@ public class DeityAPI extends DeityPlugin {
     }
     
     @Override
+    protected void initLanguage() {
+    }
+    
+    @Override
     protected void initCmds() {
         this.registerCommand(queryCommandHandler);
     }
@@ -88,6 +92,7 @@ public class DeityAPI extends DeityPlugin {
     
     /**
      * Returns access to the API handler
+     * 
      * @return InternalAPI
      */
     public static InternalAPI getAPI() {
