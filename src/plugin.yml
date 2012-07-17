@@ -1,0 +1,12 @@
+name: DeityAPI
+main: com.imdeity.deityapi.DeityAPI
+version: 12.07.16
+language: english.yml
+author: vanZeben
+description: A multipurposed API for Bukkit developers
+website: http://www.ImDeity.com/
+load: startup
+
+commands:
+    Query:
+        aliases: []
