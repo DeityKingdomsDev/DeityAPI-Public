@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -37,9 +38,10 @@ public abstract class DeityPlugin extends JavaPlugin {
             long startTime = System.currentTimeMillis();
             chat = new DeityPluginChat(getDescription().getName());
             config = new DeityPluginConfig(getDescription().getName(), this.getConfig(), "plugins/" + getDescription().getName() + "/config.yml");
-            language = new DeityPluginLanguage(getDescription().getName(), this.getConfig(), "plugins/" + getDescription().getName() + "/language.yml");
             initConfig();
             config.saveConfig();
+
+            language = new DeityPluginLanguage(getDescription().getName(), YamlConfiguration.loadConfiguration(new File("plugins/" + getDescription().getName() + "/language.yml")), "plugins/" + getDescription().getName() + "/language.yml");
             initLanguage();
             language.save();
             
@@ -55,9 +57,10 @@ public abstract class DeityPlugin extends JavaPlugin {
         } else {
             chat = new DeityPluginChat(getDescription().getName());
             config = new DeityPluginConfig(getDescription().getName(), this.getConfig(), "plugins/" + getDescription().getName() + "/config.yml");
-            language = new DeityPluginLanguage(getDescription().getName(), this.getConfig(), "plugins/" + getDescription().getName() + "/language.yml");
             initConfig();
             config.saveConfig();
+
+            language = new DeityPluginLanguage(getDescription().getName(), YamlConfiguration.loadConfiguration(new File("plugins/" + getDescription().getName() + "/language.yml")), "plugins/" + getDescription().getName() + "/language.yml");
             initLanguage();
             language.save();
             

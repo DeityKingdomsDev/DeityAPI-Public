@@ -1,9 +1,11 @@
 package com.imdeity.deityapi;
 
+import java.io.File;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.economy.Economy;
 
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import com.imdeity.deityapi.api.DeityPlugin;
@@ -36,6 +38,9 @@ public class DeityAPI extends DeityPlugin {
         config = new DeityPluginConfig(getDescription().getName(), this.getConfig(), "plugins/" + getDescription().getName() + "/config.yml");
         initConfig();
         config.saveConfig();
+        language = new DeityPluginLanguage(getDescription().getName(), YamlConfiguration.loadConfiguration(new File("plugins/" + getDescription().getName() + "/language.yml")), "plugins/" + getDescription().getName() + "/language.yml");
+        initLanguage();
+        language.save();
         internalAPI = this.new InternalAPI();
         chat = new DeityPluginChat(getDescription().getName());
         
