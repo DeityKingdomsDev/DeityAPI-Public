@@ -37,13 +37,7 @@ public abstract class DeityPlugin extends JavaPlugin {
         if (DeityAPI.plugin.config.getBoolean(DeityAPIConfigHelper.SHOULD_PROFILE)) {
             long startTime = System.currentTimeMillis();
             chat = new DeityPluginChat(getDescription().getName());
-            config = new DeityPluginConfig(getDescription().getName(), this.getConfig(), "plugins/" + getDescription().getName() + "/config.yml");
-            initConfig();
-            config.saveConfig();
-
-            language = new DeityPluginLanguage(getDescription().getName(), YamlConfiguration.loadConfiguration(new File("plugins/" + getDescription().getName() + "/language.yml")), "plugins/" + getDescription().getName() + "/language.yml");
-            initLanguage();
-            language.save();
+            reloadPlugin();
             
             initDatabase();
             initCmds();
@@ -56,13 +50,7 @@ public abstract class DeityPlugin extends JavaPlugin {
             chat.out("Enabled - " + ((finalTime - startTime) / 1000) + (((finalTime - startTime) / 1000) == 1 ? " second" : " seconds"));
         } else {
             chat = new DeityPluginChat(getDescription().getName());
-            config = new DeityPluginConfig(getDescription().getName(), this.getConfig(), "plugins/" + getDescription().getName() + "/config.yml");
-            initConfig();
-            config.saveConfig();
-
-            language = new DeityPluginLanguage(getDescription().getName(), YamlConfiguration.loadConfiguration(new File("plugins/" + getDescription().getName() + "/language.yml")), "plugins/" + getDescription().getName() + "/language.yml");
-            initLanguage();
-            language.save();
+            reloadPlugin();
             
             initDatabase();
             initCmds();
@@ -146,6 +134,16 @@ public abstract class DeityPlugin extends JavaPlugin {
     protected void registerListener(DeityListener listener) {
         this.listeners.add(listener);
         this.getServer().getPluginManager().registerEvents(listener, this);
+    }
+    
+    public void reloadPlugin() {
+        config = new DeityPluginConfig(getDescription().getName(), this.getConfig(), "plugins/" + getDescription().getName() + "/config.yml");
+        initConfig();
+        config.saveConfig();
+        
+        language = new DeityPluginLanguage(getDescription().getName(), YamlConfiguration.loadConfiguration(new File("plugins/" + getDescription().getName() + "/language.yml")), "plugins/" + getDescription().getName() + "/language.yml");
+        initLanguage();
+        language.save();
     }
     
     /**

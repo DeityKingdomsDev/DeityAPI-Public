@@ -226,6 +226,7 @@ public class DatabaseResults {
             ColumnInfo columnInfo = this.columnInfo.get(columnIndex);
             switch (columnInfo.columnType) {
                 case Types.VARCHAR:
+                case Types.LONGVARCHAR:
                     return (String) (this.rawResults.get(index).get(columnIndex));
                 default:
                     throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot be retrieved with getString.", columnIndex, columnInfo.columnName));
@@ -255,6 +256,7 @@ public class DatabaseResults {
             case Types.DOUBLE:
             case Types.FLOAT:
             case Types.INTEGER:
+            case Types.LONGVARCHAR:
             case Types.VARCHAR:
             case Types.BOOLEAN:
             case Types.DATE:

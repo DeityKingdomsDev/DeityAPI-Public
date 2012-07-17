@@ -234,6 +234,19 @@ public abstract class DeityCommandHandler implements CommandExecutor {
      * @param page
      */
     protected void showHelp(CommandSender sender, int page) {
+        List<String> helpOutput = new ArrayList<String>();
+        
+        for (String name : this.helpOutput.keySet()) {
+            if (this.commandPermissions.get(name) == null || this.commandPermissions.get(name).isEmpty()) {
+                helpOutput.add(this.helpOutput.get(name));
+                continue;
+            } else {
+                if ((sender instanceof ConsoleCommandSender) || (sender instanceof Player && ((Player) sender).hasPermission(this.commandPermissions.get(name)))) {
+                    helpOutput.add(this.helpOutput.get(name));
+                }
+            }
+        }
+        
         // pagination
         int numPages = 0;
         if (helpOutput.size() % NUM_ELEMENTS_PER_PAGE != 0) {
@@ -250,18 +263,6 @@ public abstract class DeityCommandHandler implements CommandExecutor {
             page = 1;
         } else if (page > numPages) {
             page = numPages;
-        }
-        List<String> helpOutput = new ArrayList<String>();
-        
-        for (String name : this.helpOutput.keySet()) {
-            if (this.commandPermissions.get(name) == null || this.commandPermissions.get(name).isEmpty()) {
-                helpOutput.add(this.helpOutput.get(name));
-                continue;
-            } else {
-                if ((sender instanceof ConsoleCommandSender) || (sender instanceof Player && ((Player) sender).hasPermission(this.commandPermissions.get(name)))) {
-                    helpOutput.add(this.helpOutput.get(name));
-                }
-            }
         }
         int numStartElementOnCurrentPage = ((page - 1) * NUM_ELEMENTS_PER_PAGE);
         int numMaxElemetsOnCurrentPage = (((page) * NUM_ELEMENTS_PER_PAGE) < helpOutput.size() ? ((page) * NUM_ELEMENTS_PER_PAGE) : helpOutput.size());
