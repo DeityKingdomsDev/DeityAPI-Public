@@ -137,11 +137,11 @@ public abstract class DeityPlugin extends JavaPlugin {
     }
     
     public void reloadPlugin() {
-        config = new DeityPluginConfig(getDescription().getName(), this.getConfig(), "plugins/" + getDescription().getName() + "/config.yml");
+        config = new DeityPluginConfig(getDescription().getName(), this.getConfig(), this.getDataFolder() + "/config.yml");
         initConfig();
         config.saveConfig();
         
-        language = new DeityPluginLanguage(getDescription().getName(), YamlConfiguration.loadConfiguration(new File("plugins/" + getDescription().getName() + "/language.yml")), "plugins/" + getDescription().getName() + "/language.yml");
+        language = new DeityPluginLanguage(getDescription().getName(), YamlConfiguration.loadConfiguration(new File(this.getDataFolder() + "/language.yml")), this.getDataFolder() + "/language.yml");
         initLanguage();
         language.save();
     }
