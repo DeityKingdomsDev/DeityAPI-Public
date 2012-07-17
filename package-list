@@ -1,0 +1,8 @@
+com.imdeity.deityapi
+com.imdeity.deityapi.api
+com.imdeity.deityapi.cmds
+com.imdeity.deityapi.cmds.query
+com.imdeity.deityapi.exception
+com.imdeity.deityapi.object
+com.imdeity.deityapi.records
+com.imdeity.deityapi.utils
