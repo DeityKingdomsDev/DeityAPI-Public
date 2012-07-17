@@ -2,3 +2,5 @@ DeityAPI-
 This plugin is designed to make the tedios tasks such as chat/config/command handling simple and unified. Think of it like the borg for bukkit.
 
 Original developed for the ImDeityKingdoms server however this is a public release, so we can release our plugins that use this without converting them.
+
+Javadocs located at http://DeityKingdomsDev.github.com/DeityAPI-Public
