@@ -11,10 +11,14 @@ import com.imdeity.deityapi.cmds.query.QueryShowCommand;
  */
 public class QueryCommandHandler extends DeityCommandHandler {
     
+    public QueryCommandHandler(String pluginName) {
+        super(pluginName, "Query");
+    }
+    
     @Override
     protected void initRegisteredCommands() {
-        this.registerCommand("show", "", "Echos queries to console before executing", new QueryShowCommand());
-        this.registerCommand("hide", "", "Stops echoing queries to console", new QueryHideCommand());
+        this.registerCommand("show", "", "Echos queries to console before executing", new QueryShowCommand(), "DeityAPI.admin");
+        this.registerCommand("hide", "", "Stops echoing queries to console", new QueryHideCommand(), "DeityAPI.admin");
     }
     
 }

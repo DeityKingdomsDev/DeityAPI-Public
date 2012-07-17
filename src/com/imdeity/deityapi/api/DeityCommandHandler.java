@@ -9,14 +9,16 @@ import java.util.Map;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import com.imdeity.deityapi.DeityAPI;
 
 /**
- * This class should be extended in all main command handler classes with the name <Command>CommandExecutor
+ * This class should be extended in all main command handler classes with the
+ * name <Command>CommandExecutor
+ * 
  * @author vanZeben
- *
  */
 public abstract class DeityCommandHandler implements CommandExecutor {
     
@@ -26,23 +28,31 @@ public abstract class DeityCommandHandler implements CommandExecutor {
     protected Map<String, DeityCommandReceiver> registeredCommands = new HashMap<String, DeityCommandReceiver>();
     private Map<String, String> commandDescriptions = new HashMap<String, String>();
     private Map<String, List<String>> commandArguments = new HashMap<String, List<String>>();
-    private List<String> helpOutput = new ArrayList<String>();
+    private Map<String, String> commandPermissions = new HashMap<String, String>();
+    private Map<String, String> helpOutput = new HashMap<String, String>();
+    private String pluginName;
+    private String baseCommandName;
     
     /**
-     * Initializes all commands registered, will also build help pages
+     * Initializes the command and builds helpfiles
+     * 
+     * @param pluginName
+     * @param baseCommand
      */
-    public DeityCommandHandler() {
+    public DeityCommandHandler(String pluginName, String baseCommandName) {
+        this.pluginName = pluginName;
+        this.baseCommandName = baseCommandName;
         this.initRegisteredCommands();
         List<String> commandNames = getCommandNames();
         Collections.sort(commandNames);
         for (String cs : commandNames) {
             if (!cs.equalsIgnoreCase("")) {
                 if (cs.equalsIgnoreCase("help")) {
-                    helpOutput.add(PAGE_FORMAT.replaceAll("%command%", this.getName().toLowerCase()).replaceAll("%subCommand%", "help").replaceAll("%arguments%", "<page-number>").replaceAll("%description%", "Shows the help files"));
+                    helpOutput.put(cs.toLowerCase(), PAGE_FORMAT.replaceAll("%command%", this.getLowerCaseName()).replaceAll("%subCommand%", "help").replaceAll("%arguments%", "<page-number>").replaceAll("%description%", "Shows the help files"));
                     continue;
                 }
                 for (String s : commandArguments.get(cs)) {
-                    helpOutput.add(PAGE_FORMAT.replaceAll("%command%", this.getName().toLowerCase()).replaceAll("%subCommand%", cs).replaceAll("%arguments%", s).replaceAll("%description%", this.commandDescriptions.get(cs)));
+                    helpOutput.put(cs.toLowerCase(), PAGE_FORMAT.replaceAll("%command%", this.getLowerCaseName()).replaceAll("%subCommand%", cs).replaceAll("%arguments%", s).replaceAll("%description%", this.commandDescriptions.get(cs)));
                 }
             }
         }
@@ -67,46 +77,43 @@ public abstract class DeityCommandHandler implements CommandExecutor {
      * command as well
      */
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
-        if (args.length > 0) {
-            if (args[0].toLowerCase().equalsIgnoreCase("help")) {
-                int page = 1;
-                if (args.length > 1) {
-                    try {
-                        page = Integer.parseInt(args[1]);
-                    } catch (NumberFormatException e) {
-                        page = 1;
-                    }
-                }
-                showHelp(sender, page);
-                return true;
-            } else if (!this.registeredCommands.containsKey(args[0].toLowerCase())) {
-                this.invalidCommand(sender, command);
-                return true;
-            }
-            String subCommand = args[0].toLowerCase();
+        String subCommand = "";
+        if (args.length == 0) {
+            subCommand = "help";
+            args = new String[0];
+        } else {
+            subCommand = args[0].toLowerCase();
             args = DeityAPI.getAPI().getUtilAPI().getStringUtils().remFirstArg(args);
-            if (sender instanceof Player) {
+        }
+        
+        if (subCommand.equalsIgnoreCase("help")) {
+            int page = 1;
+            if (args.length > 1) {
+                try {
+                    page = Integer.parseInt(args[1]);
+                } catch (NumberFormatException e) {
+                    page = 1;
+                }
+            }
+            showHelp(sender, page);
+            return true;
+        }
+        if (this.registeredCommands.get(subCommand) == null) {
+            this.invalidSubCommand(sender);
+            return true;
+        }
+        
+        if (sender instanceof Player) {
+            if (this.commandPermissions.get(subCommand) == null || this.commandPermissions.get(subCommand).isEmpty() || (this.commandPermissions.get(subCommand) != null && ((Player) sender).hasPermission(this.commandPermissions.get(subCommand)))) {
                 if (!this.registeredCommands.get(subCommand).onPlayerRunCommand((Player) sender, args)) {
-                    this.invalidPerms(sender, command);
+                    this.invalidSubCommand(sender);
                 }
             } else {
-                if (!this.registeredCommands.get(subCommand).onConsoleRunCommand(args)) {
-                    this.invalidPerms(sender, command);
-                }
+                this.invalidPerms(sender);
             }
         } else {
-            if (this.registeredCommands.containsKey("")) {
-                if (sender instanceof Player) {
-                    if (!this.registeredCommands.get("").onPlayerRunCommand((Player) sender, args)) {
-                        this.invalidPerms(sender, command);
-                    }
-                } else {
-                    if (!this.registeredCommands.get("").onConsoleRunCommand(args)) {
-                        this.invalidPerms(sender, command);
-                    }
-                }
-            } else {
-                showHelp(sender, 1);
+            if (!this.registeredCommands.get(subCommand).onConsoleRunCommand(args)) {
+                this.invalidSubCommand(sender);
             }
         }
         return true;
@@ -129,11 +136,12 @@ public abstract class DeityCommandHandler implements CommandExecutor {
      * @param commandReceiver
      *            Where the Command Receiver is located
      */
-    protected void registerCommand(String commandName, List<String> arguments, String description, DeityCommandReceiver commandReceiver) {
+    protected void registerCommand(String commandName, List<String> arguments, String description, DeityCommandReceiver commandReceiver, String commandPermissionNode) {
         commandName = commandName.toLowerCase();
         this.registeredCommands.put(commandName, commandReceiver);
         this.commandDescriptions.put(commandName, description);
         this.commandArguments.put(commandName, arguments);
+        this.commandPermissions.put(commandName, commandPermissionNode);
     }
     
     /**
@@ -148,7 +156,7 @@ public abstract class DeityCommandHandler implements CommandExecutor {
      * @param commandReceiver
      *            Where the Command Receiver is located
      */
-    protected void registerCommand(String commandName, String[] arguments, String description, DeityCommandReceiver commandReceiver) {
+    protected void registerCommand(String commandName, String[] arguments, String description, DeityCommandReceiver commandReceiver, String commandPermissionNode) {
         commandName = commandName.toLowerCase();
         this.registeredCommands.put(commandName, commandReceiver);
         this.commandDescriptions.put(commandName, description);
@@ -159,6 +167,7 @@ public abstract class DeityCommandHandler implements CommandExecutor {
         }
         
         this.commandArguments.put(commandName, args);
+        this.commandPermissions.put(commandName, commandPermissionNode);
     }
     
     /**
@@ -173,7 +182,7 @@ public abstract class DeityCommandHandler implements CommandExecutor {
      * @param commandReceiver
      *            Where the Command Receiver is located
      */
-    protected void registerCommand(String commandName, String arguments, String description, DeityCommandReceiver commandReceiver) {
+    protected void registerCommand(String commandName, String arguments, String description, DeityCommandReceiver commandReceiver, String commandPermissionNode) {
         commandName = commandName.toLowerCase();
         this.registeredCommands.put(commandName, commandReceiver);
         this.commandDescriptions.put(commandName, description);
@@ -182,6 +191,7 @@ public abstract class DeityCommandHandler implements CommandExecutor {
         args.add(arguments);
         
         this.commandArguments.put(commandName, args);
+        this.commandPermissions.put(commandName, commandPermissionNode);
     }
     
     /**
@@ -192,11 +202,13 @@ public abstract class DeityCommandHandler implements CommandExecutor {
      * @param command
      *            Command that was called
      */
-    private void invalidCommand(CommandSender sender, Command command) {
+    private void invalidSubCommand(CommandSender sender) {
         if (sender instanceof Player) {
-            DeityAPI.getAPI().getChatAPI().sendPlayerMessage(((Player) sender), "DeityAPI", "You entered an &cinvalid &fcommand.&/ Type &e/" + this.getLowerCaseName() + " help &f for help");
+            DeityAPI.getAPI().getChatAPI().sendPlayerMessage(((Player) sender), this.pluginName, "You entered an &cinvalid &fsub-command");
+            DeityAPI.getAPI().getChatAPI().sendPlayerMessage(((Player) sender), this.pluginName, "Type &e/" + this.getLowerCaseName() + " help &ffor help");
         } else {
-            DeityAPI.getAPI().getChatAPI().outWarn("DeityAPI", "You entered an invalid command");
+            DeityAPI.getAPI().getChatAPI().outWarn(this.pluginName, "You entered an invalid command");
+            DeityAPI.getAPI().getChatAPI().outWarn(this.pluginName, "Type /" + this.getLowerCaseName() + " help for help");
         }
     }
     
@@ -208,11 +220,10 @@ public abstract class DeityCommandHandler implements CommandExecutor {
      * @param command
      *            Command that was called
      */
-    private void invalidPerms(CommandSender sender, Command command) {
+    private void invalidPerms(CommandSender sender) {
         if (sender instanceof Player) {
-            DeityAPI.getAPI().getChatAPI().sendPlayerMessage(((Player) sender), "DeityAPI", "You entered an &cinvalid &fcommand or do not have permission.&/ Type &e/" + this.getLowerCaseName() + " help &f for help");
-        } else {
-            DeityAPI.getAPI().getChatAPI().outWarn("DeityAPI", "You entered an &cinvalid &fcommand. Type &e/" + this.getLowerCaseName() + " help &f for help");
+            DeityAPI.getAPI().getChatAPI().sendPlayerMessage(((Player) sender), this.pluginName, "You have &cinvalid &fpermissions");
+            DeityAPI.getAPI().getChatAPI().sendPlayerMessage(((Player) sender), this.pluginName, "Type &e/" + this.getLowerCaseName() + " help &ffor a list of valid commands");
         }
     }
     
@@ -240,7 +251,18 @@ public abstract class DeityCommandHandler implements CommandExecutor {
         } else if (page > numPages) {
             page = numPages;
         }
+        List<String> helpOutput = new ArrayList<String>();
         
+        for (String name : this.helpOutput.keySet()) {
+            if (this.commandPermissions.get(name) == null || this.commandPermissions.get(name).isEmpty()) {
+                helpOutput.add(this.helpOutput.get(name));
+                continue;
+            } else {
+                if ((sender instanceof ConsoleCommandSender) || (sender instanceof Player && ((Player) sender).hasPermission(this.commandPermissions.get(name)))) {
+                    helpOutput.add(this.helpOutput.get(name));
+                }
+            }
+        }
         int numStartElementOnCurrentPage = ((page - 1) * NUM_ELEMENTS_PER_PAGE);
         int numMaxElemetsOnCurrentPage = (((page) * NUM_ELEMENTS_PER_PAGE) < helpOutput.size() ? ((page) * NUM_ELEMENTS_PER_PAGE) : helpOutput.size());
         
@@ -274,7 +296,7 @@ public abstract class DeityCommandHandler implements CommandExecutor {
      * @return
      */
     public String getName() {
-        return this.getClass().getSimpleName().replaceAll("CommandHandler", "");
+        return this.baseCommandName;
     }
     
     /**

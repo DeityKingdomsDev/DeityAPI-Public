@@ -14,14 +14,10 @@ public class QueryShowCommand extends DeityCommandReceiver {
     
     @Override
     public boolean onPlayerRunCommand(Player player, String[] args) {
-        if (player.isOp()) {
-            DeityAPI.getAPI().getDataAPI().getMySQL().setShowQueries(true);
-            DeityAPI.plugin.chat.sendPlayerMessage(player, "You enabled console mysql query logging");
-            DeityAPI.plugin.chat.out(player.getName() + " enabled console mysql query logging");
-            return true;
-        } else {
-            return false;
-        }
+        DeityAPI.getAPI().getDataAPI().getMySQL().setShowQueries(true);
+        DeityAPI.plugin.chat.sendPlayerMessage(player, "You enabled console mysql query logging");
+        DeityAPI.plugin.chat.out(player.getName() + " enabled console mysql query logging");
+        return true;
     }
     
     @Override

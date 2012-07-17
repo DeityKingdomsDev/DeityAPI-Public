@@ -29,7 +29,7 @@ public class DeityAPI extends DeityPlugin {
     private static InternalAPI internalAPI;
     public static DeityRegistration registration = new DeityRegistration();
     
-    private QueryCommandHandler queryCommandHandler = new QueryCommandHandler();
+    private QueryCommandHandler queryCommandHandler = new QueryCommandHandler("DeityAPI");
     
     @Override
     public void onEnable() {
