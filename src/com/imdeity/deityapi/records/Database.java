@@ -64,7 +64,7 @@ public class Database {
         try {
             this.conn = DriverManager.getConnection(this.getConnectionString());
         } catch (SQLException e) {
-            throw new DataSourceException("[DeityAPI] Failed to connect to MySQL. Have you updated the config?");
+            throw new DataSourceException("Failed to connect to MySQL. Have you updated the config?");
         }
     }
     

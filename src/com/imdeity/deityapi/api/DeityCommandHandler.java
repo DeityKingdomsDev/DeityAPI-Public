@@ -22,7 +22,6 @@ import com.imdeity.deityapi.DeityAPI;
  */
 public abstract class DeityCommandHandler implements CommandExecutor {
     
-    private static final int NUM_ELEMENTS_PER_PAGE = 5;
     private static final String PAGE_FORMAT = "/%command% %subCommand% %arguments%: %description%";
     
     protected Map<String, DeityCommandReceiver> registeredCommands = new HashMap<String, DeityCommandReceiver>();
@@ -46,14 +45,14 @@ public abstract class DeityCommandHandler implements CommandExecutor {
         List<String> commandNames = getCommandNames();
         Collections.sort(commandNames);
         for (String cs : commandNames) {
-            if (!cs.equalsIgnoreCase("")) {
-                if (cs.equalsIgnoreCase("help")) {
-                    helpOutput.put(cs.toLowerCase(), PAGE_FORMAT.replaceAll("%command%", this.getLowerCaseName()).replaceAll("%subCommand%", "help").replaceAll("%arguments%", "<page-number>").replaceAll("%description%", "Shows the help files"));
-                    continue;
-                }
-                for (String s : commandArguments.get(cs)) {
-                    helpOutput.put(cs.toLowerCase(), PAGE_FORMAT.replaceAll("%command%", this.getLowerCaseName()).replaceAll("%subCommand%", cs).replaceAll("%arguments%", s).replaceAll("%description%", this.commandDescriptions.get(cs)));
-                }
+            if (cs.equals("")) {
+                helpOutput.put(cs.toLowerCase(), PAGE_FORMAT.replaceAll("%command%", this.getLowerCaseName()).replaceAll(" %subCommand%", "").replaceAll(" %arguments%", "").replaceAll("%description%", this.commandDescriptions.get("")));
+            } else if (cs.equalsIgnoreCase("help")) {
+                helpOutput.put(cs.toLowerCase(), PAGE_FORMAT.replaceAll("%command%", this.getLowerCaseName()).replaceAll("%subCommand%", "help").replaceAll("%arguments%", "<page-number>").replaceAll("%description%", "Shows the help files"));
+                continue;
+            }
+            for (String s : commandArguments.get(cs)) {
+                helpOutput.put(cs.toLowerCase(), PAGE_FORMAT.replaceAll("%command%", this.getLowerCaseName()).replaceAll("%subCommand%", cs).replaceAll("%arguments%", s).replaceAll("%description%", this.commandDescriptions.get(cs)));
             }
         }
     }
@@ -79,7 +78,11 @@ public abstract class DeityCommandHandler implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
         String subCommand = "";
         if (args.length == 0) {
-            subCommand = "help";
+            if (this.registeredCommands.get("") != null) {
+                subCommand = "";
+            } else {
+                subCommand = "help";
+            }
             args = new String[0];
         } else {
             subCommand = args[0].toLowerCase();
@@ -235,7 +238,8 @@ public abstract class DeityCommandHandler implements CommandExecutor {
      */
     protected void showHelp(CommandSender sender, int page) {
         List<String> helpOutput = new ArrayList<String>();
-        
+        List<String> output = new ArrayList<String>();
+        // Permissions
         for (String name : this.helpOutput.keySet()) {
             if (this.commandPermissions.get(name) == null || this.commandPermissions.get(name).isEmpty()) {
                 helpOutput.add(this.helpOutput.get(name));
@@ -248,24 +252,9 @@ public abstract class DeityCommandHandler implements CommandExecutor {
         }
         
         // pagination
-        int numPages = 0;
-        if (helpOutput.size() % NUM_ELEMENTS_PER_PAGE != 0) {
-            for (int i = 0; i < 5; i++) {
-                if ((helpOutput.size() + i) % NUM_ELEMENTS_PER_PAGE == 0) {
-                    numPages = ((helpOutput.size() + i) / NUM_ELEMENTS_PER_PAGE);
-                }
-            }
-        } else {
-            numPages = (helpOutput.size() / NUM_ELEMENTS_PER_PAGE);
-        }
-        
-        if (page < 1) {
-            page = 1;
-        } else if (page > numPages) {
-            page = numPages;
-        }
-        int numStartElementOnCurrentPage = ((page - 1) * NUM_ELEMENTS_PER_PAGE);
-        int numMaxElemetsOnCurrentPage = (((page) * NUM_ELEMENTS_PER_PAGE) < helpOutput.size() ? ((page) * NUM_ELEMENTS_PER_PAGE) : helpOutput.size());
+        int numPages = DeityAPI.getAPI().getDataAPI().getPaginationUtils().getNumPages(helpOutput);
+        page = DeityAPI.getAPI().getDataAPI().getPaginationUtils().getCurrentPage(page, numPages);
+        output = DeityAPI.getAPI().getDataAPI().getPaginationUtils().paginateInput(helpOutput, page);
         
         if (sender instanceof Player) {
             Player player = (Player) sender;
@@ -274,8 +263,8 @@ public abstract class DeityCommandHandler implements CommandExecutor {
             DeityAPI.getAPI().getChatAPI().sendPlayerMessageNoTitleNewLine(player, "-------------------------");
             
             // content
-            for (int i = numStartElementOnCurrentPage; i < numMaxElemetsOnCurrentPage; i++) {
-                String[] split = helpOutput.get(i).split(":");
+            for (String s : output) {
+                String[] split = s.split(":");
                 String newFormat = "&3" + split[0].trim() + "&7: &b" + DeityAPI.getAPI().getUtilAPI().getStringUtils().join(DeityAPI.getAPI().getUtilAPI().getStringUtils().remFirstArg(split)).trim();
                 DeityAPI.getAPI().getChatAPI().sendPlayerMessageNoTitleNewLine(player, newFormat);
             }
@@ -285,8 +274,8 @@ public abstract class DeityCommandHandler implements CommandExecutor {
             sender.sendMessage("-------------------------");
             
             // content
-            for (int i = numStartElementOnCurrentPage; i < numMaxElemetsOnCurrentPage; i++) {
-                sender.sendMessage(helpOutput.get(i));
+            for (String s : output) {
+                sender.sendMessage(s);
             }
         }
     }

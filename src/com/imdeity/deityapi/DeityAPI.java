@@ -132,16 +132,22 @@ public class DeityAPI extends DeityPlugin {
                     RegisteredServiceProvider<Economy> rsp = DeityAPI.plugin.getServer().getServicesManager().getRegistration(Economy.class);
                     econ = new EconObject(rsp.getProvider());
                     getChatAPI().out("DeityAPI", "EconAPI hooked and loaded");
+                } else {
+                    throw new NoClassDefFoundError("Vault not found");
                 }
-            } catch (Exception e) {
+            } catch (NoClassDefFoundError e) {
                 getChatAPI().outSevere("DeityAPI", "EconAPI Offline: " + e.getLocalizedMessage());
                 econ = null;
             }
             
             try {
-                edit = new EditObject((WorldEditPlugin) getServer().getPluginManager().getPlugin("WorldEdit"));
-                getChatAPI().out("DeityAPI", "EditAPI hooked and loaded");
-            } catch (Exception e) {
+                if (getServer().getPluginManager().getPlugin("WorldEdit") != null) {
+                    edit = new EditObject((WorldEditPlugin) getServer().getPluginManager().getPlugin("WorldEdit"));
+                    getChatAPI().out("DeityAPI", "EditAPI hooked and loaded");
+                } else {
+                    throw new NoClassDefFoundError("WorldEdit not found");
+                }
+            } catch (NoClassDefFoundError e) {
                 getChatAPI().outSevere("DeityAPI", "EditAPI Offline: " + e.getLocalizedMessage());
                 edit = null;
             }
@@ -150,7 +156,7 @@ public class DeityAPI extends DeityPlugin {
                 effect = new EffectObject();
                 getChatAPI().out("DeityAPI", "EffectAPI hooked and loaded");
             } catch (Exception e) {
-                getChatAPI().outSevere("DeityAPI", "EffectAPI Offline: " + e.getLocalizedMessage());
+                getChatAPI().outSevere("DeityAPI", "EffectAPI Offline");
                 effect = null;
             }
             
@@ -158,7 +164,7 @@ public class DeityAPI extends DeityPlugin {
                 mob = new MobObject();
                 getChatAPI().out("DeityAPI", "MobAPI hooked and loaded");
             } catch (Exception e) {
-                getChatAPI().outSevere("DeityAPI", "MobAPI Offline: " + e.getLocalizedMessage());
+                getChatAPI().outSevere("DeityAPI", "MobAPI Offline");
                 mob = null;
             }
             
@@ -166,14 +172,18 @@ public class DeityAPI extends DeityPlugin {
                 player = new PlayerObject();
                 getChatAPI().out("DeityAPI", "PlayerAPI hooked and loaded");
             } catch (Exception e) {
-                getChatAPI().outSevere("DeityAPI", "PlayerAPI Offline: " + e.getLocalizedMessage());
+                getChatAPI().outSevere("DeityAPI", "PlayerAPI Offline");
                 player = null;
             }
             
             try {
-                sec = new SecObject((WorldGuardPlugin) getServer().getPluginManager().getPlugin("WorldGuard"));
-                getChatAPI().out("DeityAPI", "SecAPI hooked and loaded");
-            } catch (Exception e) {
+                if (getServer().getPluginManager().getPlugin("WorldGuard") != null) {
+                    sec = new SecObject((WorldGuardPlugin) getServer().getPluginManager().getPlugin("WorldGuard"));
+                    getChatAPI().out("DeityAPI", "SecAPI hooked and loaded");
+                } else {
+                    throw new NoClassDefFoundError("WorldGuard not found");
+                }
+            } catch (NoClassDefFoundError e) {
                 getChatAPI().outSevere("DeityAPI", "SecAPI Offline: " + e.getLocalizedMessage());
                 sec = null;
             }
@@ -182,7 +192,7 @@ public class DeityAPI extends DeityPlugin {
                 utils = new UtilsObject();
                 getChatAPI().out("DeityAPI", "UtilsAPI hooked and loaded");
             } catch (Exception e) {
-                getChatAPI().outSevere("DeityAPI", "UtilsAPI Offline: " + e.getLocalizedMessage());
+                getChatAPI().outSevere("DeityAPI", "UtilsAPI Offline");
                 utils = null;
             }
         }
