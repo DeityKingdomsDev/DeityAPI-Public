@@ -414,7 +414,7 @@ public abstract class DeityPlugin extends JavaPlugin {
         
         public AutoUpdater(DeityPlugin plugin) {
             this.plugin = plugin;
-            DeityAPI.plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(DeityAPI.plugin, this, 0, 30 * 60 * 20);
+            DeityAPI.plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(DeityAPI.plugin, this, 25 * 20, 30 * 60 * 20);
         }
         
         public void run() {
