@@ -91,9 +91,9 @@ public abstract class DeityCommandHandler implements CommandExecutor {
         
         if (subCommand.equalsIgnoreCase("help")) {
             int page = 1;
-            if (args.length > 1) {
+            if (args.length >= 1) {
                 try {
-                    page = Integer.parseInt(args[1]);
+                    page = Integer.parseInt(args[0]);
                 } catch (NumberFormatException e) {
                     page = 1;
                 }

@@ -2,18 +2,26 @@ package com.imdeity.deityapi.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.imdeity.deityapi.DeityAPI;
 import com.imdeity.deityapi.DeityAPIConfigHelper;
+import com.imdeity.deityapi.utils.Metrics;
 
 /**
  * This class should be extended by the main JavaPlugin class
@@ -47,7 +55,7 @@ public abstract class DeityPlugin extends JavaPlugin {
             DeityAPI.registration.registerPlugin(this);
             long finalTime = System.currentTimeMillis();
             
-            chat.out("Enabled - " + ((finalTime - startTime) / 1000) + (((finalTime - startTime) / 1000) == 1 ? " second" : " seconds"));
+            chat.out("Enabled - " + ((double) (finalTime - startTime) / (double) 1000) + (((double) (finalTime - startTime) / (double) 1000) == 1 ? " second" : " seconds"));
         } else {
             chat = new DeityPluginChat(getDescription().getName());
             reloadPlugin();
@@ -59,6 +67,15 @@ public abstract class DeityPlugin extends JavaPlugin {
             initInternalDatamembers();
             DeityAPI.registration.registerPlugin(this);
             chat.out("Enabled");
+        }
+        try {
+            new Metrics(this);
+        } catch (IOException e) {
+        }
+        if (DeityAPI.plugin.config.getBoolean(DeityAPIConfigHelper.INFORM_ON_UPDATE)) {
+            if (this.getDescription().getWebsite() != null) {
+                new AutoUpdater(this);
+            }
         }
     }
     
@@ -388,6 +405,47 @@ public abstract class DeityPlugin extends JavaPlugin {
          */
         public void sendGlobalNoHeader(String msg) {
             DeityAPI.getAPI().getChatAPI().sendGlobalMessage("", msg);
+        }
+    }
+    
+    public class AutoUpdater implements Runnable {
+        
+        private DeityPlugin plugin;
+        
+        public AutoUpdater(DeityPlugin plugin) {
+            this.plugin = plugin;
+            DeityAPI.plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(DeityAPI.plugin, this, 0, 30 * 60 * 20);
+        }
+        
+        public void run() {
+            String newVersionNumber = getNewestVersionNumber();
+            if (!newVersionNumber.contains(getCurrentVersion())) {
+                plugin.chat.outWarn(newVersionNumber + " was released! You should update at " + plugin.getDescription().getWebsite());
+            }
+        }
+        
+        private String getCurrentVersion() {
+            return plugin.getDescription().getVersion();
+        }
+        
+        private String getNewestVersionNumber() {
+            String currentVersion = getCurrentVersion();
+            try {
+                URL url = new URL(plugin.getDescription().getWebsite() + "/files.rss");
+                Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(url.openConnection().getInputStream());
+                doc.getDocumentElement().normalize();
+                NodeList nodes = doc.getElementsByTagName("item");
+                Node firstNode = nodes.item(0);
+                if (firstNode.getNodeType() == 1) {
+                    Element firstElement = (Element) firstNode;
+                    NodeList firstElementTagName = firstElement.getElementsByTagName("title");
+                    Element firstNameElement = (Element) firstElementTagName.item(0);
+                    NodeList firstNodes = firstNameElement.getChildNodes();
+                    return firstNodes.item(0).getNodeValue();
+                }
+            } catch (Exception e) {
+            }
+            return currentVersion;
         }
     }
 }
