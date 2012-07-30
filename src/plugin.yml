@@ -1,12 +1,11 @@
 name: DeityAPI
 main: com.imdeity.deityapi.DeityAPI
-version: 12.07.20
+version: 12.07.30
 language: english.yml
 authors: [vanZeben]
 description: A multipurposed API for Bukkit developers
 website: http://dev.bukkit.org/server-mods/deityapi
 load: startup
-
 commands:
     Query:
         aliases: []

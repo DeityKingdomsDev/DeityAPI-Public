@@ -69,7 +69,8 @@ public abstract class DeityPlugin extends JavaPlugin {
             chat.out("Enabled");
         }
         try {
-            new Metrics(this);
+            Metrics metrics = new Metrics(this);
+            metrics.start();
         } catch (IOException e) {
         }
         if (DeityAPI.plugin.config.getBoolean(DeityAPIConfigHelper.INFORM_ON_UPDATE)) {
@@ -151,6 +152,10 @@ public abstract class DeityPlugin extends JavaPlugin {
     protected void registerListener(DeityListener listener) {
         this.listeners.add(listener);
         this.getServer().getPluginManager().registerEvents(listener, this);
+    }
+    
+    protected void registerTask(int id) {
+        this.taskList.add(id);
     }
     
     public void reloadPlugin() {
@@ -414,7 +419,7 @@ public abstract class DeityPlugin extends JavaPlugin {
         
         public AutoUpdater(DeityPlugin plugin) {
             this.plugin = plugin;
-            DeityAPI.plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(DeityAPI.plugin, this, 25 * 20, 30 * 60 * 20);
+            DeityAPI.plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(DeityAPI.plugin, this, 25 * 20, 60 * 60 * 20);
         }
         
         public void run() {

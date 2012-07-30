@@ -9,6 +9,8 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
+import ru.tehkode.permissions.bukkit.PermissionsEx;
+
 import com.imdeity.deityapi.api.DeityPlugin;
 import com.imdeity.deityapi.api.DeityRegistration;
 import com.imdeity.deityapi.cmds.QueryCommandHandler;
@@ -75,6 +77,7 @@ public class DeityAPI extends DeityPlugin {
         this.config.addDefaultConfigValue(DeityAPIConfigHelper.MYSQL_DATABASE_NAME, "kingdoms");
         this.config.addDefaultConfigValue(DeityAPIConfigHelper.MYSQL_DATABASE_USERNAME, "root");
         this.config.addDefaultConfigValue(DeityAPIConfigHelper.MYSQL_DATABASE_PASSWORD, "root");
+        this.config.set("deityapi.mcbans.api_token", "");
     }
     
     @Override
@@ -327,6 +330,18 @@ public class DeityAPI extends DeityPlugin {
                 return null;
             }
             return utils;
+        }
+        
+        public com.imdeity.deityapi.object.ServerObject getServerAPI() {
+            return new com.imdeity.deityapi.object.ServerObject();
+        }
+        
+        public com.imdeity.deityapi.object.BanObject getBanAPI() {
+            return new com.imdeity.deityapi.object.BanObject();
+        }
+        
+        public com.imdeity.deityapi.object.PermObject getPermAPI() {
+            return new com.imdeity.deityapi.object.PermObject(PermissionsEx.getPermissionManager());
         }
     }
 }

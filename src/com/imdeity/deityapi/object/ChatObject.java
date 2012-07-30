@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import org.bukkit.entity.Player;
 
 import com.imdeity.deityapi.DeityAPI;
+import com.imdeity.mail.MailMain;
 
 /**
  * Handles interaction with messaging
@@ -186,5 +187,18 @@ public class ChatObject {
             }
         }
         return false;
+    }
+    
+    public void sendMessageToOnlineStaff(String string) {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    public void sendMailToPlayer(String sender, String receiver, String message) {
+        if (DeityAPI.plugin.getServer().getPluginManager().getPlugin("Mail") != null) {
+            if (((MailMain) DeityAPI.plugin.getServer().getPluginManager().getPlugin("Mail")).getMailPlayerAPI(sender) != null) {
+                ((MailMain) DeityAPI.plugin.getServer().getPluginManager().getPlugin("Mail")).getMailPlayerAPI(sender).sendMail(receiver, message);
+            }
+        }
     }
 }

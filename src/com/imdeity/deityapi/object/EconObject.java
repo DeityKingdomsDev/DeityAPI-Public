@@ -1,5 +1,7 @@
 package com.imdeity.deityapi.object;
 
+import java.text.DecimalFormat;
+
 import net.milkbowl.vault.economy.Economy;
 
 import com.imdeity.deityapi.exception.NegativeMoneyException;
@@ -166,6 +168,57 @@ public class EconObject {
         // "VALUES (?,?,?,?)";
         //
         // Deity.data.getDB().Write(sql, sender, receiver, amount, note);
+    }
+    
+    /**
+     * Returns a textual representation of a players balance
+     * 
+     * @param playername
+     * @return
+     */
+    public String getFormattedBalance(String playername) {
+        double amount = this.getBalance(playername);
+        DecimalFormat formatter = new DecimalFormat("#,###.00");
+        
+        if (amount == 1) {
+            return formatter.format(amount) + " " + getCurrencyNameSingular();
+        } else {
+            return formatter.format(amount) + " " + getCurrencyNamePlural();
+        }
+    }
+    
+    /**
+     * Sends a textual representation of a balance
+     * 
+     * @param playername
+     * @return
+     */
+    public String getFormattedBalance(double amount) {
+        DecimalFormat formatter = new DecimalFormat("#,###.00");
+        
+        if (amount == 1) {
+            return formatter.format(amount) + " " + getCurrencyNameSingular();
+        } else {
+            return formatter.format(amount) + " " + getCurrencyNamePlural();
+        }
+    }
+    
+    /**
+     * Returns the current name in singular format
+     * 
+     * @return
+     */
+    public String getCurrencyNameSingular() {
+        return this.econ.currencyNameSingular();
+    }
+    
+    /**
+     * Returns the currency name in plural format
+     * 
+     * @return
+     */
+    public String getCurrencyNamePlural() {
+        return this.econ.currencyNamePlural();
     }
     
 }

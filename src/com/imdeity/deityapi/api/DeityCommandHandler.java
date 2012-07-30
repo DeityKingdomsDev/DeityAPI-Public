@@ -28,7 +28,7 @@ public abstract class DeityCommandHandler implements CommandExecutor {
     private Map<String, String> commandDescriptions = new HashMap<String, String>();
     private Map<String, List<String>> commandArguments = new HashMap<String, List<String>>();
     private Map<String, String> commandPermissions = new HashMap<String, String>();
-    private Map<String, String> helpOutput = new HashMap<String, String>();
+    private Map<String, List<String>> helpOutput = new HashMap<String, List<String>>();
     private String pluginName;
     private String baseCommandName;
     
@@ -45,14 +45,17 @@ public abstract class DeityCommandHandler implements CommandExecutor {
         List<String> commandNames = getCommandNames();
         Collections.sort(commandNames);
         for (String cs : commandNames) {
+            if (helpOutput.get(cs.toLowerCase()) == null) {
+                helpOutput.put(cs.toLowerCase(), new ArrayList<String>());
+            }
             if (cs.equals("")) {
-                helpOutput.put(cs.toLowerCase(), PAGE_FORMAT.replaceAll("%command%", this.getLowerCaseName()).replaceAll(" %subCommand%", "").replaceAll(" %arguments%", "").replaceAll("%description%", this.commandDescriptions.get("")));
+                helpOutput.get(cs.toLowerCase()).add(PAGE_FORMAT.replaceAll("%command%", this.getLowerCaseName()).replaceAll(" %subCommand%", "").replaceAll(" %arguments%", "").replaceAll("%description%", this.commandDescriptions.get("")));
             } else if (cs.equalsIgnoreCase("help")) {
-                helpOutput.put(cs.toLowerCase(), PAGE_FORMAT.replaceAll("%command%", this.getLowerCaseName()).replaceAll("%subCommand%", "help").replaceAll("%arguments%", "<page-number>").replaceAll("%description%", "Shows the help files"));
+                helpOutput.get(cs.toLowerCase()).add(PAGE_FORMAT.replaceAll("%command%", this.getLowerCaseName()).replaceAll("%subCommand%", "help").replaceAll("%arguments%", "<page-number>").replaceAll("%description%", "Shows the help files"));
                 continue;
             }
             for (String s : commandArguments.get(cs)) {
-                helpOutput.put(cs.toLowerCase(), PAGE_FORMAT.replaceAll("%command%", this.getLowerCaseName()).replaceAll("%subCommand%", cs).replaceAll("%arguments%", s).replaceAll("%description%", this.commandDescriptions.get(cs)));
+                helpOutput.get(cs.toLowerCase()).add(PAGE_FORMAT.replaceAll("%command%", this.getLowerCaseName()).replaceAll("%subCommand%", cs).replaceAll("%arguments%", s).replaceAll("%description%", this.commandDescriptions.get(cs)));
             }
         }
     }
@@ -242,11 +245,15 @@ public abstract class DeityCommandHandler implements CommandExecutor {
         // Permissions
         for (String name : this.helpOutput.keySet()) {
             if (this.commandPermissions.get(name) == null || this.commandPermissions.get(name).isEmpty()) {
-                helpOutput.add(this.helpOutput.get(name));
+                for (String s : this.helpOutput.get(name)) {
+                    helpOutput.add(s);
+                }
                 continue;
             } else {
                 if ((sender instanceof ConsoleCommandSender) || (sender instanceof Player && ((Player) sender).hasPermission(this.commandPermissions.get(name)))) {
-                    helpOutput.add(this.helpOutput.get(name));
+                    for (String s : this.helpOutput.get(name)) {
+                        helpOutput.add(s);
+                    }
                 }
             }
         }
