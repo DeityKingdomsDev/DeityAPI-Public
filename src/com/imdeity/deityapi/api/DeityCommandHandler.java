@@ -13,6 +13,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import com.imdeity.deityapi.DeityAPI;
+import com.imdeity.deityapi.utils.StringMgmt;
 
 /**
  * This class should be extended in all main command handler classes with the
@@ -25,8 +26,9 @@ public abstract class DeityCommandHandler implements CommandExecutor {
     private static final String PAGE_FORMAT = "/%command% %subCommand% %arguments%: %description%";
     
     protected Map<String, DeityCommandReceiver> registeredCommands = new HashMap<String, DeityCommandReceiver>();
-    private Map<String, String> commandDescriptions = new HashMap<String, String>();
+    private Map<String, String[]> commandAliases = new HashMap<String, String[]>();
     private Map<String, List<String>> commandArguments = new HashMap<String, List<String>>();
+    private Map<String, String> commandDescriptions = new HashMap<String, String>();
     private Map<String, String> commandPermissions = new HashMap<String, String>();
     private Map<String, List<String>> helpOutput = new HashMap<String, List<String>>();
     private String pluginName;
@@ -51,11 +53,13 @@ public abstract class DeityCommandHandler implements CommandExecutor {
             if (cs.equals("")) {
                 helpOutput.get(cs.toLowerCase()).add(PAGE_FORMAT.replaceAll("%command%", this.getLowerCaseName()).replaceAll(" %subCommand%", "").replaceAll(" %arguments%", "").replaceAll("%description%", this.commandDescriptions.get("")));
             } else if (cs.equalsIgnoreCase("help")) {
-                helpOutput.get(cs.toLowerCase()).add(PAGE_FORMAT.replaceAll("%command%", this.getLowerCaseName()).replaceAll("%subCommand%", "help").replaceAll("%arguments%", "<page-number>").replaceAll("%description%", "Shows the help files"));
+                helpOutput.get(cs.toLowerCase()).add(PAGE_FORMAT.replaceAll("%command%", this.getLowerCaseName()).replaceAll("%subCommand%", "[help/?]").replaceAll("%arguments%", "<page-number>").replaceAll("%description%", "Shows the help files"));
                 continue;
             }
+            StringMgmt stringUtils = new StringMgmt();
             for (String s : commandArguments.get(cs)) {
-                helpOutput.get(cs.toLowerCase()).add(PAGE_FORMAT.replaceAll("%command%", this.getLowerCaseName()).replaceAll("%subCommand%", cs).replaceAll("%arguments%", s).replaceAll("%description%", this.commandDescriptions.get(cs)));
+                helpOutput.get(cs.toLowerCase()).add(
+                        PAGE_FORMAT.replaceAll("%command%", this.getLowerCaseName()).replaceAll("%subCommand%", "[" + stringUtils.join(this.getSubCommandNameAndAliases(cs), "/") + "]").replaceAll("%arguments%", s).replaceAll("%description%", this.commandDescriptions.get(cs)));
             }
         }
     }
@@ -92,7 +96,7 @@ public abstract class DeityCommandHandler implements CommandExecutor {
             args = DeityAPI.getAPI().getUtilAPI().getStringUtils().remFirstArg(args);
         }
         
-        if (subCommand.equalsIgnoreCase("help")) {
+        if (subCommand.equalsIgnoreCase("help") || subCommand.equalsIgnoreCase("?")) {
             int page = 1;
             if (args.length >= 1) {
                 try {
@@ -104,11 +108,11 @@ public abstract class DeityCommandHandler implements CommandExecutor {
             showHelp(sender, page);
             return true;
         }
-        if (this.registeredCommands.get(subCommand) == null) {
+        if (getOriginalSubCommand(subCommand) == null) {
             this.invalidSubCommand(sender);
             return true;
         }
-        
+        subCommand = getOriginalSubCommand(subCommand);
         if (sender instanceof Player) {
             if (this.commandPermissions.get(subCommand) == null || this.commandPermissions.get(subCommand).isEmpty() || (this.commandPermissions.get(subCommand) != null && ((Player) sender).hasPermission(this.commandPermissions.get(subCommand)))) {
                 if (!this.registeredCommands.get(subCommand).onPlayerRunCommand((Player) sender, args)) {
@@ -142,12 +146,33 @@ public abstract class DeityCommandHandler implements CommandExecutor {
      * @param commandReceiver
      *            Where the Command Receiver is located
      */
+    @Deprecated()
     protected void registerCommand(String commandName, List<String> arguments, String description, DeityCommandReceiver commandReceiver, String commandPermissionNode) {
         commandName = commandName.toLowerCase();
         this.registeredCommands.put(commandName, commandReceiver);
         this.commandDescriptions.put(commandName, description);
         this.commandArguments.put(commandName, arguments);
         this.commandPermissions.put(commandName, commandPermissionNode);
+    }
+    
+    /**
+     * Function to register a command
+     * 
+     * @param commandName
+     *            Sub-command that relates to the DeityCommandReceiver
+     * @param aliases
+     *            Aliases for the commandName
+     * @param arguments
+     *            Any additional parameters excluding the sub-command
+     * @param description
+     *            Description of what the command does
+     * @param commandReceiver
+     *            Where the Command Receiver is located
+     */
+    protected void registerCommand(String commandName, String[] aliases, List<String> arguments, String description, DeityCommandReceiver commandReceiver, String commandPermissionNode) {
+        commandName = commandName.toLowerCase();
+        this.commandAliases.put(commandName, aliases);
+        this.registerCommand(commandName, arguments, description, commandReceiver, commandPermissionNode);
     }
     
     /**
@@ -162,6 +187,7 @@ public abstract class DeityCommandHandler implements CommandExecutor {
      * @param commandReceiver
      *            Where the Command Receiver is located
      */
+    @Deprecated()
     protected void registerCommand(String commandName, String[] arguments, String description, DeityCommandReceiver commandReceiver, String commandPermissionNode) {
         commandName = commandName.toLowerCase();
         this.registeredCommands.put(commandName, commandReceiver);
@@ -181,6 +207,8 @@ public abstract class DeityCommandHandler implements CommandExecutor {
      * 
      * @param commandName
      *            Sub-command that relates to the DeityCommandReceiver
+     * @param aliases
+     *            Aliases for the commandName
      * @param arguments
      *            Any additional parameters excluding the sub-command
      * @param description
@@ -188,6 +216,25 @@ public abstract class DeityCommandHandler implements CommandExecutor {
      * @param commandReceiver
      *            Where the Command Receiver is located
      */
+    protected void registerCommand(String commandName, String[] aliases, String[] arguments, String description, DeityCommandReceiver commandReceiver, String commandPermissionNode) {
+        commandName = commandName.toLowerCase();
+        this.commandAliases.put(commandName, aliases);
+        this.registerCommand(commandName, arguments, description, commandReceiver, commandPermissionNode);
+    }
+    
+    /**
+     * Function to register a command
+     * 
+     * @param commandName
+     *            Sub-command that relates to the DeityCommandReceiver
+     * @param arguments
+     *            Any additional parameters excluding the sub-command
+     * @param description
+     *            Description of what the command does
+     * @param commandReceiver
+     *            Where the Command Receiver is located
+     */
+    @Deprecated()
     protected void registerCommand(String commandName, String arguments, String description, DeityCommandReceiver commandReceiver, String commandPermissionNode) {
         commandName = commandName.toLowerCase();
         this.registeredCommands.put(commandName, commandReceiver);
@@ -198,6 +245,26 @@ public abstract class DeityCommandHandler implements CommandExecutor {
         
         this.commandArguments.put(commandName, args);
         this.commandPermissions.put(commandName, commandPermissionNode);
+    }
+    
+    /**
+     * Function to register a command
+     * 
+     * @param commandName
+     *            Sub-command that relates to the DeityCommandReceiver
+     * @param aliases
+     *            Aliases for the commandName
+     * @param arguments
+     *            Any additional parameters excluding the sub-command
+     * @param description
+     *            Description of what the command does
+     * @param commandReceiver
+     *            Where the Command Receiver is located
+     */
+    protected void registerCommand(String commandName, String[] aliases, String arguments, String description, DeityCommandReceiver commandReceiver, String commandPermissionNode) {
+        commandName = commandName.toLowerCase();
+        this.commandAliases.put(commandName, aliases);
+        this.registerCommand(commandName, arguments, description, commandReceiver, commandPermissionNode);
     }
     
     /**
@@ -304,5 +371,33 @@ public abstract class DeityCommandHandler implements CommandExecutor {
      */
     public String getLowerCaseName() {
         return getName().toLowerCase();
+    }
+    
+    public String getOriginalSubCommand(String subCommand) {
+        for (String commandName : commandAliases.keySet()) {
+            if (getSubCommandNameAndAliases(commandName) != null) {
+                for (String commandAlias : getSubCommandNameAndAliases(commandName)) {
+                    if (commandAlias.equalsIgnoreCase(subCommand)) { return commandName; }
+                }
+            }
+        }
+        return null;
+    }
+    
+    public List<String> getSubCommandNameAndAliases(String subCommand) {
+        List<String> output = new ArrayList<String>();
+        if (commandAliases.containsKey(subCommand) && commandAliases.get(subCommand) != null) {
+            for (int i = 0; i < commandAliases.get(subCommand).length + 1; i++) {
+                if (i == 0) {
+                    output.add(subCommand);
+                } else {
+                    output.add(commandAliases.get(subCommand)[i - 1]);
+                }
+            }
+            return output;
+        } else {
+            output.add(subCommand);
+            return output;
+        }
     }
 }

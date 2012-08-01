@@ -17,8 +17,8 @@ public class QueryCommandHandler extends DeityCommandHandler {
     
     @Override
     protected void initRegisteredCommands() {
-        this.registerCommand("show", "", "Echos queries to console before executing", new QueryShowCommand(), "DeityAPI.admin");
-        this.registerCommand("hide", "", "Stops echoing queries to console", new QueryHideCommand(), "DeityAPI.admin");
+        this.registerCommand("show", null, "", "Echos queries to console before executing", new QueryShowCommand(), "DeityAPI.admin");
+        this.registerCommand("hide", null, "", "Stops echoing queries to console", new QueryHideCommand(), "DeityAPI.admin");
     }
     
 }

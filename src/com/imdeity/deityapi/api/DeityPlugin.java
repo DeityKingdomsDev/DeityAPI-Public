@@ -416,6 +416,7 @@ public abstract class DeityPlugin extends JavaPlugin {
     public class AutoUpdater implements Runnable {
         
         private DeityPlugin plugin;
+        private String newestVersionNumber = null;
         
         public AutoUpdater(DeityPlugin plugin) {
             this.plugin = plugin;
@@ -423,9 +424,11 @@ public abstract class DeityPlugin extends JavaPlugin {
         }
         
         public void run() {
-            String newVersionNumber = getNewestVersionNumber();
-            if (!newVersionNumber.contains(getCurrentVersion())) {
-                plugin.chat.outWarn(newVersionNumber + " was released! You should update at " + plugin.getDescription().getWebsite());
+            if (newestVersionNumber == null) {
+                newestVersionNumber = getNewestVersionNumber();
+            }
+            if (!newestVersionNumber.contains(getCurrentVersion())) {
+                plugin.chat.outWarn(newestVersionNumber + " was released! You should update at " + plugin.getDescription().getWebsite());
             }
         }
         

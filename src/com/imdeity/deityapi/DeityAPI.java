@@ -145,6 +145,7 @@ public class DeityAPI extends DeityPlugin {
                 if (getServer().getPluginManager().getPlugin("Vault") != null) {
                     getServer().getPluginManager().enablePlugin(getServer().getPluginManager().getPlugin("Vault"));
                     RegisteredServiceProvider<Economy> rsp = DeityAPI.plugin.getServer().getServicesManager().getRegistration(Economy.class);
+                    if (rsp == null) { throw new NoClassDefFoundError("Vault found, but economy source not linked"); }
                     econ = new EconObject(rsp.getProvider());
                     getChatAPI().out("DeityAPI", "EconAPI hooked and loaded");
                 } else {
