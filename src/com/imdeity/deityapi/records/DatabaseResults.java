@@ -150,11 +150,45 @@ public class DatabaseResults {
         if (columnIndex != null) {
             ColumnInfo columnInfo = this.columnInfo.get(columnIndex);
             switch (columnInfo.columnType) {
-                case Types.FLOAT:
                 case Types.DOUBLE:
+                case Types.FLOAT:
+                case Types.DECIMAL:
+                case Types.INTEGER:
+                case Types.SMALLINT:
+                case Types.TINYINT:
+                case Types.BIT:
+                case Types.BOOLEAN:
                     return (Double) (this.rawResults.get(index).get(columnIndex));
                 default:
-                    throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot be retrieved with getString.", columnIndex, columnInfo.columnName));
+                    throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot be retrieved with getDouble.", columnIndex, columnInfo.columnName));
+            }
+        }
+        throw new SQLDataException(String.format("Field index %d out of range", columnIndex));
+    }
+    
+    /**
+     * Returns a float from the query
+     * 
+     * @param index
+     * @param columnName
+     * @return
+     * @throws SQLDataException
+     */
+    public Float getFloat(int index, String columnName) throws SQLDataException {
+        Integer columnIndex = this.getColumnIndex(columnName);
+        if (columnIndex != null) {
+            ColumnInfo columnInfo = this.columnInfo.get(columnIndex);
+            switch (columnInfo.columnType) {
+                case Types.FLOAT:
+                case Types.DECIMAL:
+                case Types.INTEGER:
+                case Types.SMALLINT:
+                case Types.TINYINT:
+                case Types.BIT:
+                case Types.BOOLEAN:
+                    return (Float) (this.rawResults.get(index).get(columnIndex));
+                default:
+                    throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot be retrieved with getFloat.", columnIndex, columnInfo.columnName));
             }
         }
         throw new SQLDataException(String.format("Field index %d out of range", columnIndex));
@@ -175,6 +209,10 @@ public class DatabaseResults {
             
             switch (columnInfo.columnType) {
                 case Types.INTEGER:
+                case Types.SMALLINT:
+                case Types.TINYINT:
+                case Types.BIT:
+                case Types.BOOLEAN:
                     return (Integer) (this.rawResults.get(index).get(columnIndex));
                 default:
                     throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot be retrieved with getInteger.", columnIndex, columnInfo.columnName));
@@ -197,6 +235,11 @@ public class DatabaseResults {
             ColumnInfo columnInfo = this.columnInfo.get(columnIndex);
             switch (columnInfo.columnType) {
                 case Types.INTEGER:
+                case Types.BIGINT:
+                case Types.SMALLINT:
+                case Types.TINYINT:
+                case Types.BIT:
+                case Types.BOOLEAN:
                     Object temp = this.rawResults.get(index).get(columnIndex);
                     if (temp instanceof Integer) {
                         return ((Integer) temp).longValue();
@@ -207,6 +250,38 @@ public class DatabaseResults {
                     }
                 default:
                     throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot be retrieved with getLong.", columnIndex, columnInfo.columnName));
+            }
+        }
+        throw new SQLDataException(String.format("Column '%s' does not exist in query", columnName));
+    }
+    
+    /**
+     * Returns a short from the query
+     * 
+     * @param index
+     * @param columnName
+     * @return
+     * @throws SQLDataException
+     */
+    public short getShort(int index, String columnName) throws SQLDataException {
+        Integer columnIndex = this.getColumnIndex(columnName);
+        if (columnIndex != null) {
+            ColumnInfo columnInfo = this.columnInfo.get(columnIndex);
+            switch (columnInfo.columnType) {
+                case Types.SMALLINT:
+                case Types.TINYINT:
+                case Types.BIT:
+                case Types.BOOLEAN:
+                    Object temp = this.rawResults.get(index).get(columnIndex);
+                    if (temp instanceof Integer) {
+                        return ((Integer) temp).shortValue();
+                    } else if (temp instanceof Short) {
+                        return (Short) temp;
+                    } else {
+                        throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot case to SHORT.", columnIndex, columnInfo.columnName));
+                    }
+                default:
+                    throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot be retrieved with getShort.", columnIndex, columnInfo.columnName));
             }
         }
         throw new SQLDataException(String.format("Column '%s' does not exist in query", columnName));
@@ -255,7 +330,12 @@ public class DatabaseResults {
         switch (columnType) {
             case Types.DOUBLE:
             case Types.FLOAT:
+            case Types.DECIMAL:
             case Types.INTEGER:
+            case Types.SMALLINT:
+            case Types.TINYINT:
+            case Types.BIT:
+            case Types.BIGINT:
             case Types.LONGVARCHAR:
             case Types.VARCHAR:
             case Types.BOOLEAN:
