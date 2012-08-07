@@ -88,7 +88,7 @@ public class MobObject {
             try {
                 for (int i = 0; i < this.amount; i++) {
                     if (this.type != null) {
-                        LivingEntity entity = this.location.getWorld().spawnCreature(this.location, this.type);
+                        LivingEntity entity = (LivingEntity) this.location.getWorld().spawnEntity(this.location, this.type);
                         this.entityIds.add(entity.getEntityId());
                     }
                 }

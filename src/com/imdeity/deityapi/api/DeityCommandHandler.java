@@ -114,7 +114,7 @@ public abstract class DeityCommandHandler implements CommandExecutor {
         }
         subCommand = getOriginalSubCommand(subCommand);
         if (sender instanceof Player) {
-            if (this.commandPermissions.get(subCommand) == null || this.commandPermissions.get(subCommand).isEmpty() || (this.commandPermissions.get(subCommand) != null && ((Player) sender).hasPermission(this.commandPermissions.get(subCommand)))) {
+            if (this.commandPermissions.get(subCommand) == null || this.commandPermissions.get(subCommand).isEmpty() || (this.commandPermissions.get(subCommand) != null && DeityAPI.getAPI().getPermAPI().hasPermission(((Player) sender), this.commandPermissions.get(subCommand)))) {
                 if (!this.registeredCommands.get(subCommand).onPlayerRunCommand((Player) sender, args)) {
                     this.invalidSubCommand(sender);
                 }

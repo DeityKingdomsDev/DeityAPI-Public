@@ -281,4 +281,22 @@ public class Database {
             return false;
         }
     }
+    
+    /**
+     * Writes a query to the database
+     * 
+     * @param sql
+     * @param params
+     * @return
+     */
+    public boolean writeNoError(String sql, Object... params) {
+        try {
+            this.ensureConnection();
+            PreparedStatement stmt = this.prepareSqlStatement(sql, params);
+            stmt.executeUpdate();
+            return true;
+        } catch (SQLException ex) {
+            return false;
+        }
+    }
 }

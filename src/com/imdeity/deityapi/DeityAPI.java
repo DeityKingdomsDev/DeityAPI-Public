@@ -4,24 +4,28 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-import ru.tehkode.permissions.bukkit.PermissionsEx;
-
 import com.imdeity.deityapi.api.DeityPlugin;
 import com.imdeity.deityapi.api.DeityRegistration;
 import com.imdeity.deityapi.cmds.QueryCommandHandler;
+import com.imdeity.deityapi.object.BanObject;
 import com.imdeity.deityapi.object.ChatObject;
 import com.imdeity.deityapi.object.DataObject;
+import com.imdeity.deityapi.object.DeityPermObject;
 import com.imdeity.deityapi.object.EconObject;
 import com.imdeity.deityapi.object.EditObject;
 import com.imdeity.deityapi.object.EffectObject;
 import com.imdeity.deityapi.object.MobObject;
+import com.imdeity.deityapi.object.PermObject;
 import com.imdeity.deityapi.object.PlayerObject;
 import com.imdeity.deityapi.object.SecObject;
+import com.imdeity.deityapi.object.ServerObject;
 import com.imdeity.deityapi.object.UtilsObject;
 import com.imdeity.deityapi.utils.Metrics;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -127,11 +131,25 @@ public class DeityAPI extends DeityPlugin {
         private EffectObject effect;
         private MobObject mob;
         private PlayerObject player;
+        private PermObject perm;
         private SecObject sec;
         private UtilsObject utils;
         
         public InternalAPI() {
-            chat = new ChatObject();
+            try {
+                if (getServer().getPluginManager().getPlugin("Vault") != null) {
+                    getServer().getPluginManager().enablePlugin(getServer().getPluginManager().getPlugin("Vault"));
+                    RegisteredServiceProvider<Chat> rsp = DeityAPI.plugin.getServer().getServicesManager().getRegistration(Chat.class);
+                    if (rsp == null) { throw new NoClassDefFoundError("Vault found, but chat source not linked"); }
+                    chat = new ChatObject(rsp.getProvider());
+                    getChatAPI().out("DeityAPI", "EconAPI hooked and loaded");
+                } else {
+                    throw new NoClassDefFoundError("Vault not found");
+                }
+            } catch (NoClassDefFoundError e) {
+                chat = new ChatObject();
+                getChatAPI().outSevere("DeityAPI", "ChatAPI not hooked into vault");
+            }
             
             try {
                 data = new DataObject();
@@ -190,6 +208,21 @@ public class DeityAPI extends DeityPlugin {
             } catch (Exception e) {
                 getChatAPI().outSevere("DeityAPI", "PlayerAPI Offline");
                 player = null;
+            }
+            
+            try {
+                if (getServer().getPluginManager().getPlugin("Vault") != null) {
+                    getServer().getPluginManager().enablePlugin(getServer().getPluginManager().getPlugin("Vault"));
+                    RegisteredServiceProvider<Permission> rsp = DeityAPI.plugin.getServer().getServicesManager().getRegistration(Permission.class);
+                    if (rsp == null) { throw new NoClassDefFoundError("Vault found, but perm source not linked"); }
+                    perm = new PermObject(rsp.getProvider());
+                    getChatAPI().out("DeityAPI", "PermAPI hooked and loaded");
+                } else {
+                    throw new NoClassDefFoundError("Vault not found");
+                }
+            } catch (NoClassDefFoundError e) {
+                getChatAPI().outSevere("DeityAPI", "PermAPI Offline: " + e.getLocalizedMessage());
+                econ = null;
             }
             
             try {
@@ -308,6 +341,19 @@ public class DeityAPI extends DeityPlugin {
         }
         
         /**
+         * Returns access to the PermAPI, will return null if the API is offline
+         * 
+         * @return EconObject
+         */
+        public PermObject getPermAPI() {
+            if (perm == null) {
+                getChatAPI().outWarn("DeityAPI", new Exception().getStackTrace()[1].getClassName() + " attempted to access the perm api which is offline (Check startup logs)");
+                return null;
+            }
+            return perm;
+        }
+        
+        /**
          * Returns access to the SecAPI, will return null if the API is offline
          * 
          * @return SecObject
@@ -333,16 +379,31 @@ public class DeityAPI extends DeityPlugin {
             return utils;
         }
         
-        public com.imdeity.deityapi.object.ServerObject getServerAPI() {
-            return new com.imdeity.deityapi.object.ServerObject();
+        /**
+         * For use on the ImDeity Kingdoms server only
+         * 
+         * @return
+         */
+        public ServerObject getServerAPI() {
+            return new ServerObject();
         }
         
-        public com.imdeity.deityapi.object.BanObject getBanAPI() {
-            return new com.imdeity.deityapi.object.BanObject();
+        /**
+         * For use on the ImDeity Kingdoms server only
+         * 
+         * @return
+         */
+        public BanObject getBanAPI() {
+            return new BanObject();
         }
         
-        public com.imdeity.deityapi.object.PermObject getPermAPI() {
-            return new com.imdeity.deityapi.object.PermObject(PermissionsEx.getPermissionManager());
+        /**
+         * For use on the ImDeity Kingdoms server only
+         * 
+         * @return
+         */
+        public DeityPermObject getDeityPermAPI() {
+            return new DeityPermObject();
         }
     }
 }

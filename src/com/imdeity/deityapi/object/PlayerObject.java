@@ -28,8 +28,15 @@ import com.imdeity.deityapi.DeityAPI;
 public class PlayerObject {
     
     private HashMap<String, String> frozenPlayers = new HashMap<String, String>();
-    public InventoryObject inventory = new InventoryObject();
     private HashMap<String, Integer> playerMoving = new HashMap<String, Integer>();
+    
+    /**
+     * 
+     * @return
+     */
+    public InventoryObject getInventoryAPI() {
+        return new InventoryObject();
+    }
     
     /**
      * Returns a Player that is online
@@ -256,6 +263,8 @@ public class PlayerObject {
             if (!chunk.isLoaded()) {
                 chunk.load();
             }
+            DeityAPI.getAPI().getEffectAPI().showSmoke(player.getLocation());
+            DeityAPI.getAPI().getEffectAPI().showSmoke(location);
             return player.teleport(location);
         }
         return false;
@@ -275,6 +284,9 @@ public class PlayerObject {
             if (!chunk.isLoaded()) {
                 chunk.load();
             }
+            DeityAPI.getAPI().getEffectAPI().showSmoke(player.getLocation());
+            DeityAPI.getAPI().getEffectAPI().showSmoke(location);
+            
             return player.teleport(location, TeleportCause.COMMAND);
         }
         return false;

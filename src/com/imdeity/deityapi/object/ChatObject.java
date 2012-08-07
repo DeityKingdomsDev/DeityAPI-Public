@@ -2,6 +2,9 @@ package com.imdeity.deityapi.object;
 
 import java.util.logging.Logger;
 
+import net.milkbowl.vault.chat.Chat;
+
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import com.imdeity.deityapi.DeityAPI;
@@ -18,6 +21,19 @@ public class ChatObject {
      * Used to message to console
      */
     private Logger log = Logger.getLogger("Minecraft");
+    
+    private Chat chat = null;
+    
+    /**
+     * Main Constructor
+     */
+    public ChatObject() {
+        this.chat = null;
+    }
+    
+    public ChatObject(Chat chat) {
+        this.chat = chat;
+    }
     
     /**
      * Sends a message to console
@@ -189,11 +205,32 @@ public class ChatObject {
         return false;
     }
     
-    public void sendMessageToOnlineStaff(String string) {
-        // TODO Auto-generated method stub
-        
+    /**
+     * Sends a message to all online staff
+     * 
+     * @param option
+     *            Text to put at the beginning
+     * @param msg
+     *            Message to send
+     */
+    public void sendMessageToOnlineStaff(String option, String msg) {
+        for (Player p : DeityAPI.plugin.getServer().getOnlinePlayers()) {
+            if (DeityAPI.getAPI().getPermAPI().hasPermission(p, "deityapi.staff")) {
+                this.sendPlayerMessage(p, option, msg);
+            }
+        }
     }
     
+    /**
+     * Sends a mail if the Mail plugin is available
+     * 
+     * @param sender
+     *            Person who sent the mail
+     * @param receiver
+     *            Person who receives the mail
+     * @param message
+     *            Message that is sent
+     */
     public void sendMailToPlayer(String sender, String receiver, String message) {
         if (DeityAPI.plugin.getServer().getPluginManager().getPlugin("Mail") != null) {
             if (((MailMain) DeityAPI.plugin.getServer().getPluginManager().getPlugin("Mail")).getMailPlayerAPI(sender) != null) {
@@ -201,4 +238,31 @@ public class ChatObject {
             }
         }
     }
+    
+    /**
+     * Retrieves a players prefix
+     * 
+     * @param world
+     *            World the prefix is in
+     * @param playername
+     *            Player whos prefix you wish to retrieve
+     * @return
+     */
+    public String getPlayerPrefix(World world, String playername) {
+        return chat.getPlayerPrefix(world, playername);
+    }
+    
+    /**
+     * Retrieves a players suffix
+     * 
+     * @param world
+     *            World the suffix is in
+     * @param playername
+     *            Player whos suffix you wish to retrieve
+     * @return
+     */
+    public String getPlayerSuffix(World world, String playername) {
+        return chat.getPlayerSuffix(world, playername);
+    }
+    
 }
