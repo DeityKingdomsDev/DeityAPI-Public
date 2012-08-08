@@ -216,7 +216,8 @@ public class EditObject {
      * @throws IncompleteRegionException
      *             Thrown if the points to not match up
      */
-    public CuboidClipboard getCuboidFromLocation(String worldName, Vector placementPosition, Vector maxPoint, Vector minPoint) throws IncompleteRegionException {
+    public CuboidClipboard getCuboidFromLocation(String worldName, Vector placementPosition, Vector maxPoint, Vector minPoint)
+            throws IncompleteRegionException {
         
         Vector min = minPoint;
         Vector max = maxPoint;
@@ -284,7 +285,8 @@ public class EditObject {
      * @throws EmptyClipboardException
      *             Thrown if the schematic is empty
      */
-    public void pasteSchematicAtVector(String worldName, String schematicName, Vector loc) throws DataException, IOException, EmptyClipboardException {
+    public void pasteSchematicAtVector(String worldName, String schematicName, Vector loc) throws DataException, IOException,
+            EmptyClipboardException {
         
         // variables
         LocalSession session = this.getLocalSession();
@@ -331,6 +333,22 @@ public class EditObject {
         
     }
     
+    public boolean regenArea(Location minLocation, Location maxLocation) {
+        LocalSession session = this.getLocalSession();
+        RegionSelector selector = session.getRegionSelector(this.getLocalWorld(minLocation.getWorld().getName()));
+        selector.selectPrimary(DeityAPI.getAPI().getSecAPI().toVector(minLocation));
+        selector.selectSecondary(DeityAPI.getAPI().getSecAPI().toVector(maxLocation));
+        EditSession editSession = new EditSession(this.getLocalWorld(minLocation.getWorld().getName()), -1);
+        Region region = null;
+        try {
+            region = selector.getRegion();
+            this.getLocalWorld(minLocation.getWorld().getName()).regenerate(region, editSession);
+        } catch (IncompleteRegionException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+    
     /**
      * Saves a cuboid to memory
      * 
@@ -347,18 +365,21 @@ public class EditObject {
      * @throws DataException
      *             Thrown if the save fails
      */
-    public void saveSchematic(String schematicName, CuboidClipboard schematic) throws InvalidFilenameException, EmptyClipboardException, IOException, DataException {
+    public void saveSchematic(String schematicName, CuboidClipboard schematic) throws InvalidFilenameException,
+            EmptyClipboardException, IOException, DataException {
         
         LocalSession session = this.getLocalSession();
         session.setClipboard(schematic);
         
         String filename = schematicName + ".schematic";
-        if (!filename.matches("^[A-Za-z0-9_\\- \\./\\\\'\\$@~!%\\^\\*\\(\\)\\[\\]\\+\\{\\},\\?]+\\.[A-Za-z0-9]+$")) { throw new InvalidFilenameException(filename, "Invalid characters or extension missing"); }
+        if (!filename.matches("^[A-Za-z0-9_\\- \\./\\\\'\\$@~!%\\^\\*\\(\\)\\[\\]\\+\\{\\},\\?]+\\.[A-Za-z0-9]+$")) { throw new InvalidFilenameException(
+                filename, "Invalid characters or extension missing"); }
         File dir = EditObject.WorldEdit.getWorldEdit().getWorkingDirectoryFile(this.getLocalConfig().saveDir);
         File f = new File(dir, filename);
         if (!dir.exists()) {
             if (!dir.mkdir()) {
-                DeityAPI.getAPI().getChatAPI().outWarn("DeityAPI", "Error on Saving schematic. The storage folder could not be created.");
+                DeityAPI.getAPI().getChatAPI()
+                        .outWarn("DeityAPI", "Error on Saving schematic. The storage folder could not be created.");
             }
         }
         File parent = f.getParentFile();
@@ -407,7 +428,8 @@ public class EditObject {
         File f = new File(dir, filename);
         if (!dir.exists()) {
             if (!dir.mkdir()) {
-                DeityAPI.getAPI().getChatAPI().outWarn("DeityAPI", "Error on Saving schematic. The storage folder could not be created.");
+                DeityAPI.getAPI().getChatAPI()
+                        .outWarn("DeityAPI", "Error on Saving schematic. The storage folder could not be created.");
                 return;
             }
         }
@@ -430,7 +452,10 @@ public class EditObject {
     
     public void saveSchematicFromCoords(String schematicName, String worldName, Location minPoint, Location maxPoint) {
         try {
-            this.saveSchematic(schematicName, this.getCuboidFromLocation(worldName, DeityAPI.getAPI().getSecAPI().toVector(minPoint), DeityAPI.getAPI().getSecAPI().toVector(maxPoint), DeityAPI.getAPI().getSecAPI().toVector(minPoint)));
+            this.saveSchematic(
+                    schematicName,
+                    this.getCuboidFromLocation(worldName, DeityAPI.getAPI().getSecAPI().toVector(minPoint), DeityAPI.getAPI()
+                            .getSecAPI().toVector(maxPoint), DeityAPI.getAPI().getSecAPI().toVector(minPoint)));
         } catch (InvalidFilenameException e) {
             e.printStackTrace();
         } catch (EmptyClipboardException e) {

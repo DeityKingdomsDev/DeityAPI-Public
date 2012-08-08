@@ -43,10 +43,12 @@ public class DeityAPI extends DeityPlugin {
     public void onEnable() {
         long startTime = System.currentTimeMillis();
         initPlugin();
-        config = new DeityPluginConfig(getDescription().getName(), this.getConfig(), "plugins/" + getDescription().getName() + "/config.yml");
+        config = new DeityPluginConfig(getDescription().getName(), this.getConfig(), "plugins/" + getDescription().getName()
+                + "/config.yml");
         initConfig();
         config.saveConfig();
-        language = new DeityPluginLanguage(getDescription().getName(), YamlConfiguration.loadConfiguration(new File("plugins/" + getDescription().getName() + "/language.yml")), "plugins/" + getDescription().getName() + "/language.yml");
+        language = new DeityPluginLanguage(getDescription().getName(), YamlConfiguration.loadConfiguration(new File("plugins/"
+                + getDescription().getName() + "/language.yml")), "plugins/" + getDescription().getName() + "/language.yml");
         initLanguage();
         language.save();
         internalAPI = this.new InternalAPI();
@@ -59,7 +61,8 @@ public class DeityAPI extends DeityPlugin {
         initInternalDatamembers();
         registration.registerPlugin(this);
         long finalTime = System.currentTimeMillis();
-        chat.out("Enabled - " + ((double) (finalTime - startTime) / (double) 1000) + (((double) (finalTime - startTime) / (double) 1000) == 1 ? " second" : " seconds"));
+        chat.out("Enabled - " + ((double) (finalTime - startTime) / (double) 1000)
+                + (((double) (finalTime - startTime) / (double) 1000) == 1 ? " second" : " seconds"));
         try {
             Metrics metrics = new Metrics(this);
             metrics.start();
@@ -81,7 +84,9 @@ public class DeityAPI extends DeityPlugin {
         this.config.addDefaultConfigValue(DeityAPIConfigHelper.MYSQL_DATABASE_NAME, "kingdoms");
         this.config.addDefaultConfigValue(DeityAPIConfigHelper.MYSQL_DATABASE_USERNAME, "root");
         this.config.addDefaultConfigValue(DeityAPIConfigHelper.MYSQL_DATABASE_PASSWORD, "root");
-        this.config.set("deityapi.mcbans.api_token", "");
+        if (this.config.getString("deityapi.mcbans.api_token") != null) {
+            this.config.set("deityapi.mcbans.api_token", "");
+        }
     }
     
     @Override
@@ -162,7 +167,8 @@ public class DeityAPI extends DeityPlugin {
             try {
                 if (getServer().getPluginManager().getPlugin("Vault") != null) {
                     getServer().getPluginManager().enablePlugin(getServer().getPluginManager().getPlugin("Vault"));
-                    RegisteredServiceProvider<Economy> rsp = DeityAPI.plugin.getServer().getServicesManager().getRegistration(Economy.class);
+                    RegisteredServiceProvider<Economy> rsp = DeityAPI.plugin.getServer().getServicesManager()
+                            .getRegistration(Economy.class);
                     if (rsp == null) { throw new NoClassDefFoundError("Vault found, but economy source not linked"); }
                     econ = new EconObject(rsp.getProvider());
                     getChatAPI().out("DeityAPI", "EconAPI hooked and loaded");
@@ -213,7 +219,8 @@ public class DeityAPI extends DeityPlugin {
             try {
                 if (getServer().getPluginManager().getPlugin("Vault") != null) {
                     getServer().getPluginManager().enablePlugin(getServer().getPluginManager().getPlugin("Vault"));
-                    RegisteredServiceProvider<Permission> rsp = DeityAPI.plugin.getServer().getServicesManager().getRegistration(Permission.class);
+                    RegisteredServiceProvider<Permission> rsp = DeityAPI.plugin.getServer().getServicesManager()
+                            .getRegistration(Permission.class);
                     if (rsp == null) { throw new NoClassDefFoundError("Vault found, but perm source not linked"); }
                     perm = new PermObject(rsp.getProvider());
                     getChatAPI().out("DeityAPI", "PermAPI hooked and loaded");
@@ -253,7 +260,9 @@ public class DeityAPI extends DeityPlugin {
          */
         public ChatObject getChatAPI() {
             if (chat == null) {
-                Logger.getLogger("Minecraft").warning("[DeityAPI] " + new Exception().getStackTrace()[1].getClassName() + " attempted to access the chat api which is offline (Check startup logs)");
+                Logger.getLogger("Minecraft").warning(
+                        "[DeityAPI] " + new Exception().getStackTrace()[1].getClassName()
+                                + " attempted to access the chat api which is offline (Check startup logs)");
                 return null;
             }
             return chat;
@@ -266,7 +275,10 @@ public class DeityAPI extends DeityPlugin {
          */
         public DataObject getDataAPI() {
             if (data == null) {
-                getChatAPI().outWarn("DeityAPI", new Exception().getStackTrace()[1].getClassName() + " attempted to access the data api which is offline (Check startup logs)");
+                getChatAPI().outWarn(
+                        "DeityAPI",
+                        new Exception().getStackTrace()[1].getClassName()
+                                + " attempted to access the data api which is offline (Check startup logs)");
                 return null;
             }
             return data;
@@ -279,7 +291,10 @@ public class DeityAPI extends DeityPlugin {
          */
         public EconObject getEconAPI() {
             if (econ == null) {
-                getChatAPI().outWarn("DeityAPI", new Exception().getStackTrace()[1].getClassName() + " attempted to access the econ api which is offline (Check startup logs)");
+                getChatAPI().outWarn(
+                        "DeityAPI",
+                        new Exception().getStackTrace()[1].getClassName()
+                                + " attempted to access the econ api which is offline (Check startup logs)");
                 return null;
             }
             return econ;
@@ -293,7 +308,10 @@ public class DeityAPI extends DeityPlugin {
          */
         public EditObject getWorldEditAPI() {
             if (edit == null) {
-                getChatAPI().outWarn("DeityAPI", new Exception().getStackTrace()[1].getClassName() + " attempted to access the edit api which is offline (Check startup logs)");
+                getChatAPI().outWarn(
+                        "DeityAPI",
+                        new Exception().getStackTrace()[1].getClassName()
+                                + " attempted to access the edit api which is offline (Check startup logs)");
                 return null;
             }
             return edit;
@@ -307,7 +325,10 @@ public class DeityAPI extends DeityPlugin {
          */
         public EffectObject getEffectAPI() {
             if (effect == null) {
-                getChatAPI().outWarn("DeityAPI", new Exception().getStackTrace()[1].getClassName() + " attempted to access the effect api which is offline (Check startup logs)");
+                getChatAPI().outWarn(
+                        "DeityAPI",
+                        new Exception().getStackTrace()[1].getClassName()
+                                + " attempted to access the effect api which is offline (Check startup logs)");
                 return null;
             }
             return effect;
@@ -320,7 +341,10 @@ public class DeityAPI extends DeityPlugin {
          */
         public MobObject getMobAPI() {
             if (mob == null) {
-                getChatAPI().outWarn("DeityAPI", new Exception().getStackTrace()[1].getClassName() + " attempted to access the mob api which is offline (Check startup logs)");
+                getChatAPI().outWarn(
+                        "DeityAPI",
+                        new Exception().getStackTrace()[1].getClassName()
+                                + " attempted to access the mob api which is offline (Check startup logs)");
                 return null;
             }
             return mob;
@@ -334,7 +358,10 @@ public class DeityAPI extends DeityPlugin {
          */
         public PlayerObject getPlayerAPI() {
             if (player == null) {
-                getChatAPI().outWarn("DeityAPI", new Exception().getStackTrace()[1].getClassName() + " attempted to access the player api which is offline (Check startup logs)");
+                getChatAPI().outWarn(
+                        "DeityAPI",
+                        new Exception().getStackTrace()[1].getClassName()
+                                + " attempted to access the player api which is offline (Check startup logs)");
                 return null;
             }
             return player;
@@ -347,7 +374,10 @@ public class DeityAPI extends DeityPlugin {
          */
         public PermObject getPermAPI() {
             if (perm == null) {
-                getChatAPI().outWarn("DeityAPI", new Exception().getStackTrace()[1].getClassName() + " attempted to access the perm api which is offline (Check startup logs)");
+                getChatAPI().outWarn(
+                        "DeityAPI",
+                        new Exception().getStackTrace()[1].getClassName()
+                                + " attempted to access the perm api which is offline (Check startup logs)");
                 return null;
             }
             return perm;
@@ -360,7 +390,10 @@ public class DeityAPI extends DeityPlugin {
          */
         public SecObject getSecAPI() {
             if (sec == null) {
-                getChatAPI().outWarn("DeityAPI", new Exception().getStackTrace()[1].getClassName() + " attempted to access the sec api which is offline (Check startup logs)");
+                getChatAPI().outWarn(
+                        "DeityAPI",
+                        new Exception().getStackTrace()[1].getClassName()
+                                + " attempted to access the sec api which is offline (Check startup logs)");
                 return null;
             }
             return sec;
@@ -373,7 +406,10 @@ public class DeityAPI extends DeityPlugin {
          */
         public UtilsObject getUtilAPI() {
             if (utils == null) {
-                getChatAPI().outWarn("DeityAPI", new Exception().getStackTrace()[1].getClassName() + " attempted to access the util api which is offline (Check startup logs)");
+                getChatAPI().outWarn(
+                        "DeityAPI",
+                        new Exception().getStackTrace()[1].getClassName()
+                                + " attempted to access the util api which is offline (Check startup logs)");
                 return null;
             }
             return utils;

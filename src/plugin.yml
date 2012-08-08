@@ -1,6 +1,6 @@
 name: DeityAPI
 main: com.imdeity.deityapi.DeityAPI
-version: 12.08.06
+version: 12.08.07
 language: english.yml
 authors: [vanZeben]
 description: A multipurposed API for Bukkit developers
