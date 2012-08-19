@@ -138,7 +138,10 @@ public class EffectObject {
         player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, duration * 20, strength), true);
         this.showSmoke(player.getLocation());
         this.updateVanished(player);
-        EffectObject.vanishedPlayers.put(player.getName(), DeityAPI.plugin.getServer().getScheduler().scheduleAsyncDelayedTask(DeityAPI.plugin, new UnVanishTask(player), duration * 20));
+        EffectObject.vanishedPlayers.put(
+                player.getName(),
+                DeityAPI.plugin.getServer().getScheduler()
+                        .scheduleAsyncDelayedTask(DeityAPI.plugin, new UnVanishTask(player), duration * 20));
     }
     
     /**
@@ -177,7 +180,8 @@ public class EffectObject {
         for (int i = 0; i < 3; i++) {
             slopevector[i] /= linelength;
         }
-        EntityFireball entityFireball = new EntityFireball(world.getHandle(), originCoords[0], originCoords[1], originCoords[2], slopevector[0] * linelength, slopevector[1] * linelength, slopevector[2] * linelength);
+        EntityFireball entityFireball = new EntityFireball(world.getHandle(), originCoords[0], originCoords[1], originCoords[2],
+                slopevector[0] * linelength, slopevector[1] * linelength, slopevector[2] * linelength);
         world.getHandle().addEntity(entityFireball);
     }
     
@@ -224,7 +228,8 @@ public class EffectObject {
         for (int i = 0; i < 3; i++) {
             slopevector[i] /= linelength;
         }
-        EntitySmallFireball entitySmallFireball = new EntitySmallFireball(world.getHandle(), originCoords[0], originCoords[1], originCoords[2], slopevector[0] * linelength, slopevector[1] * linelength, slopevector[2] * linelength);
+        EntitySmallFireball entitySmallFireball = new EntitySmallFireball(world.getHandle(), originCoords[0], originCoords[1],
+                originCoords[2], slopevector[0] * linelength, slopevector[1] * linelength, slopevector[2] * linelength);
         world.getHandle().addEntity(entitySmallFireball);
     }
     
@@ -379,5 +384,9 @@ public class EffectObject {
                 other.showPlayer(player);
             }
         }
+    }
+    
+    public void createExplosion(Location location, int size) {
+        location.getWorld().createExplosion(location, size, false);
     }
 }

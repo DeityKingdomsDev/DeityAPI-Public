@@ -9,6 +9,7 @@ import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import com.imdeity.deityapi.api.DeityPlugin;
@@ -31,7 +32,7 @@ import com.imdeity.deityapi.utils.Metrics;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
-public class DeityAPI extends DeityPlugin {
+public class DeityAPI extends DeityPlugin implements Listener {
     
     public static DeityAPI plugin;
     private static InternalAPI internalAPI;
@@ -254,6 +255,15 @@ public class DeityAPI extends DeityPlugin {
         }
         
         /**
+         * Verifies that the api is online
+         * 
+         * @return
+         */
+        public boolean isChatAPIOnline() {
+            return chat != null;
+        }
+        
+        /**
          * Returns access to the ChatAPI, will return null if the API is offline
          * 
          * @return ChatObject
@@ -266,6 +276,15 @@ public class DeityAPI extends DeityPlugin {
                 return null;
             }
             return chat;
+        }
+        
+        /**
+         * Verifies that the api is online
+         * 
+         * @return
+         */
+        public boolean isDataAPIOnline() {
+            return data != null;
         }
         
         /**
@@ -285,6 +304,15 @@ public class DeityAPI extends DeityPlugin {
         }
         
         /**
+         * Verifies that the api is online
+         * 
+         * @return
+         */
+        public boolean isEconAPIOnline() {
+            return econ != null;
+        }
+        
+        /**
          * Returns access to the EconAPI, will return null if the API is offline
          * 
          * @return EconObject
@@ -298,6 +326,15 @@ public class DeityAPI extends DeityPlugin {
                 return null;
             }
             return econ;
+        }
+        
+        /**
+         * Verifies that the api is online
+         * 
+         * @return
+         */
+        public boolean isWorldEditAPIOnline() {
+            return edit != null;
         }
         
         /**
@@ -318,6 +355,15 @@ public class DeityAPI extends DeityPlugin {
         }
         
         /**
+         * Verifies that the api is online
+         * 
+         * @return
+         */
+        public boolean isEffectAPIOnline() {
+            return effect != null;
+        }
+        
+        /**
          * Returns access to the EffectAPI, will return null if the API is
          * offline
          * 
@@ -335,6 +381,15 @@ public class DeityAPI extends DeityPlugin {
         }
         
         /**
+         * Verifies that the api is online
+         * 
+         * @return
+         */
+        public boolean isMobAPIOnline() {
+            return mob != null;
+        }
+        
+        /**
          * Returns access to the MobAPI, will return null if the API is offline
          * 
          * @return MobObject
@@ -348,6 +403,15 @@ public class DeityAPI extends DeityPlugin {
                 return null;
             }
             return mob;
+        }
+        
+        /**
+         * Verifies that the api is online
+         * 
+         * @return
+         */
+        public boolean isPlayerAPIOnline() {
+            return player != null;
         }
         
         /**
@@ -368,6 +432,15 @@ public class DeityAPI extends DeityPlugin {
         }
         
         /**
+         * Verifies that the api is online
+         * 
+         * @return
+         */
+        public boolean isPermAPIOnline() {
+            return perm != null;
+        }
+        
+        /**
          * Returns access to the PermAPI, will return null if the API is offline
          * 
          * @return EconObject
@@ -384,6 +457,15 @@ public class DeityAPI extends DeityPlugin {
         }
         
         /**
+         * Verifies that the api is online
+         * 
+         * @return
+         */
+        public boolean isSecAPIOnline() {
+            return sec != null;
+        }
+        
+        /**
          * Returns access to the SecAPI, will return null if the API is offline
          * 
          * @return SecObject
@@ -397,6 +479,15 @@ public class DeityAPI extends DeityPlugin {
                 return null;
             }
             return sec;
+        }
+        
+        /**
+         * Verifies that the api is online
+         * 
+         * @return
+         */
+        public boolean isUtilsAPIOnline() {
+            return utils != null;
         }
         
         /**

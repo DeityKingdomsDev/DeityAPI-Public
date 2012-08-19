@@ -95,9 +95,12 @@ public class DatabaseResults {
                 case Types.BOOLEAN:
                     Object temp = this.rawResults.get(index).get(columnIndex);
                     if (temp instanceof Boolean) { return (Boolean) temp; }
-                    throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot case to Boolean.", columnIndex, columnInfo.columnName));
+                    throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot case to Boolean.",
+                            columnIndex, columnInfo.columnName));
                 default:
-                    throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot be retrieved with getBoolean.", columnIndex, columnInfo.columnName));
+                    throw new SQLDataException(String.format(
+                            "Field index %d (%s): Bad field type, cannot be retrieved with getBoolean.", columnIndex,
+                            columnInfo.columnName));
             }
         }
         throw new SQLDataException(String.format("Column '%s' does not exist in query", columnName));
@@ -131,7 +134,8 @@ public class DatabaseResults {
                 case Types.TIMESTAMP:
                     return (Date) (this.rawResults.get(index).get(columnIndex));
                 default:
-                    throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot be retrieved with getDate.", columnIndex, columnInfo.columnName));
+                    throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot be retrieved with getDate.",
+                            columnIndex, columnInfo.columnName));
             }
         }
         throw new SQLDataException(String.format("Column '%s' does not exist in query", columnName));
@@ -160,7 +164,9 @@ public class DatabaseResults {
                 case Types.BOOLEAN:
                     return (Double) (this.rawResults.get(index).get(columnIndex));
                 default:
-                    throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot be retrieved with getDouble.", columnIndex, columnInfo.columnName));
+                    throw new SQLDataException(String.format(
+                            "Field index %d (%s): Bad field type, cannot be retrieved with getDouble.", columnIndex,
+                            columnInfo.columnName));
             }
         }
         throw new SQLDataException(String.format("Field index %d out of range", columnIndex));
@@ -188,7 +194,9 @@ public class DatabaseResults {
                 case Types.BOOLEAN:
                     return (Float) (this.rawResults.get(index).get(columnIndex));
                 default:
-                    throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot be retrieved with getFloat.", columnIndex, columnInfo.columnName));
+                    throw new SQLDataException(String.format(
+                            "Field index %d (%s): Bad field type, cannot be retrieved with getFloat.", columnIndex,
+                            columnInfo.columnName));
             }
         }
         throw new SQLDataException(String.format("Field index %d out of range", columnIndex));
@@ -215,7 +223,9 @@ public class DatabaseResults {
                 case Types.BOOLEAN:
                     return (Integer) (this.rawResults.get(index).get(columnIndex));
                 default:
-                    throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot be retrieved with getInteger.", columnIndex, columnInfo.columnName));
+                    throw new SQLDataException(String.format(
+                            "Field index %d (%s): Bad field type, cannot be retrieved with getInteger.", columnIndex,
+                            columnInfo.columnName));
             }
         }
         throw new SQLDataException(String.format("Column '%s' does not exist in query", columnName));
@@ -246,10 +256,12 @@ public class DatabaseResults {
                     } else if (temp instanceof Long) {
                         return (Long) temp;
                     } else {
-                        throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot case to LONG.", columnIndex, columnInfo.columnName));
+                        throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot case to LONG.",
+                                columnIndex, columnInfo.columnName));
                     }
                 default:
-                    throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot be retrieved with getLong.", columnIndex, columnInfo.columnName));
+                    throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot be retrieved with getLong.",
+                            columnIndex, columnInfo.columnName));
             }
         }
         throw new SQLDataException(String.format("Column '%s' does not exist in query", columnName));
@@ -278,10 +290,13 @@ public class DatabaseResults {
                     } else if (temp instanceof Short) {
                         return (Short) temp;
                     } else {
-                        throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot case to SHORT.", columnIndex, columnInfo.columnName));
+                        throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot case to SHORT.",
+                                columnIndex, columnInfo.columnName));
                     }
                 default:
-                    throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot be retrieved with getShort.", columnIndex, columnInfo.columnName));
+                    throw new SQLDataException(String.format(
+                            "Field index %d (%s): Bad field type, cannot be retrieved with getShort.", columnIndex,
+                            columnInfo.columnName));
             }
         }
         throw new SQLDataException(String.format("Column '%s' does not exist in query", columnName));
@@ -302,9 +317,12 @@ public class DatabaseResults {
             switch (columnInfo.columnType) {
                 case Types.VARCHAR:
                 case Types.LONGVARCHAR:
+                case Types.CHAR:
                     return (String) (this.rawResults.get(index).get(columnIndex));
                 default:
-                    throw new SQLDataException(String.format("Field index %d (%s): Bad field type, cannot be retrieved with getString.", columnIndex, columnInfo.columnName));
+                    throw new SQLDataException(String.format(
+                            "Field index %d (%s): Bad field type, cannot be retrieved with getString.", columnIndex,
+                            columnInfo.columnName));
             }
         }
         throw new SQLDataException(String.format("Field index %d out of range"));
@@ -330,6 +348,7 @@ public class DatabaseResults {
         switch (columnType) {
             case Types.DOUBLE:
             case Types.FLOAT:
+            case Types.CHAR:
             case Types.DECIMAL:
             case Types.INTEGER:
             case Types.SMALLINT:

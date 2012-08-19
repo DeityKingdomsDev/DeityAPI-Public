@@ -1,7 +1,6 @@
 package com.imdeity.deityapi.object;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import net.minecraft.server.Packet39AttachEntity;
 
@@ -27,11 +26,7 @@ import com.imdeity.deityapi.DeityAPI;
  */
 public class PlayerObject {
     
-    private HashMap<String, String> frozenPlayers = new HashMap<String, String>();
-    private HashMap<String, Integer> playerMoving = new HashMap<String, Integer>();
-    
     /**
-     * 
      * @return
      */
     public InventoryObject getInventoryAPI() {
@@ -108,12 +103,13 @@ public class PlayerObject {
         player.setExp(0);
     }
     
-    public void freezePlayer(String player, String reason) {
-        this.frozenPlayers.put(player, reason);
+    public void freezePlayer(Player player) {
+        System.out.println("Walk Speed reg: " + player.getWalkSpeed());
+        player.setWalkSpeed(0.0F);
     }
     
-    public String getFrozenMessage(String player) {
-        return this.frozenPlayers.get(player);
+    public void unfreezePlayer(Player player) {
+        player.setWalkSpeed(0.2F);
     }
     
     public int getNumberOfCatsOwned(String playername) {
@@ -188,23 +184,11 @@ public class PlayerObject {
         return ent;
     }
     
-    public int getPlayerMovingCount(String player) {
-        return (this.playerMoving.get(player) == null ? 1 : this.playerMoving.get(player) + 1);
-    }
-    
     public int getTotalNumberTamedMobs(String playername) {
         int numMobs = 0;
         numMobs += this.getNumberOfWolvesOwned(playername);
         numMobs += this.getNumberOfCatsOwned(playername);
         return numMobs;
-    }
-    
-    public void incrementPlayerCounter(String player) {
-        this.playerMoving.put(player, (this.playerMoving.get(player) == null ? 1 : this.playerMoving.get(player) + 1));
-    }
-    
-    public boolean isFrozen(String player) {
-        return this.frozenPlayers.containsKey(player);
     }
     
     /**
@@ -220,16 +204,28 @@ public class PlayerObject {
     public boolean setArmor(Player player, ItemStack[] items) {
         PlayerInventory inv = player.getInventory();
         if (items.length == 4) {
-            if ((items[0].getType().compareTo(Material.GOLD_HELMET) == 0) || (items[0].getType().compareTo(Material.DIAMOND_HELMET) == 0) || (items[0].getType().compareTo(Material.IRON_HELMET) == 0) || (items[0].getType().compareTo(Material.CHAINMAIL_HELMET) == 0)) {
+            if ((items[0].getType().compareTo(Material.GOLD_HELMET) == 0)
+                    || (items[0].getType().compareTo(Material.DIAMOND_HELMET) == 0)
+                    || (items[0].getType().compareTo(Material.IRON_HELMET) == 0)
+                    || (items[0].getType().compareTo(Material.CHAINMAIL_HELMET) == 0)) {
                 inv.setHelmet(items[0]);
             }
-            if ((items[1].getType().compareTo(Material.GOLD_CHESTPLATE) == 0) || (items[1].getType().compareTo(Material.DIAMOND_CHESTPLATE) == 0) || (items[1].getType().compareTo(Material.IRON_CHESTPLATE) == 0) || (items[1].getType().compareTo(Material.CHAINMAIL_CHESTPLATE) == 0)) {
+            if ((items[1].getType().compareTo(Material.GOLD_CHESTPLATE) == 0)
+                    || (items[1].getType().compareTo(Material.DIAMOND_CHESTPLATE) == 0)
+                    || (items[1].getType().compareTo(Material.IRON_CHESTPLATE) == 0)
+                    || (items[1].getType().compareTo(Material.CHAINMAIL_CHESTPLATE) == 0)) {
                 inv.setChestplate(items[1]);
             }
-            if ((items[2].getType().compareTo(Material.GOLD_LEGGINGS) == 0) || (items[2].getType().compareTo(Material.DIAMOND_LEGGINGS) == 0) || (items[2].getType().compareTo(Material.IRON_LEGGINGS) == 0) || (items[2].getType().compareTo(Material.CHAINMAIL_LEGGINGS) == 0)) {
+            if ((items[2].getType().compareTo(Material.GOLD_LEGGINGS) == 0)
+                    || (items[2].getType().compareTo(Material.DIAMOND_LEGGINGS) == 0)
+                    || (items[2].getType().compareTo(Material.IRON_LEGGINGS) == 0)
+                    || (items[2].getType().compareTo(Material.CHAINMAIL_LEGGINGS) == 0)) {
                 inv.setLeggings(items[2]);
             }
-            if ((items[3].getType().compareTo(Material.GOLD_BOOTS) == 0) || (items[3].getType().compareTo(Material.DIAMOND_BOOTS) == 0) || (items[3].getType().compareTo(Material.IRON_BOOTS) == 0) || (items[3].getType().compareTo(Material.CHAINMAIL_BOOTS) == 0)) {
+            if ((items[3].getType().compareTo(Material.GOLD_BOOTS) == 0)
+                    || (items[3].getType().compareTo(Material.DIAMOND_BOOTS) == 0)
+                    || (items[3].getType().compareTo(Material.IRON_BOOTS) == 0)
+                    || (items[3].getType().compareTo(Material.CHAINMAIL_BOOTS) == 0)) {
                 inv.setBoots(items[3]);
             }
             return true;
@@ -239,14 +235,11 @@ public class PlayerObject {
     
     public boolean sit(Player player) {
         if (player.isOnline()) {
-            ((CraftPlayer) player).getHandle().netServerHandler.sendPacket(new Packet39AttachEntity(((CraftPlayer) player).getHandle(), ((CraftPlayer) player).getHandle()));
+            ((CraftPlayer) player).getHandle().netServerHandler.sendPacket(new Packet39AttachEntity(
+                    ((CraftPlayer) player).getHandle(), ((CraftPlayer) player).getHandle()));
             return true;
         }
         return false;
-    }
-    
-    public void stopPlayerCounter(String player) {
-        this.playerMoving.remove(player);
     }
     
     /**
@@ -290,10 +283,6 @@ public class PlayerObject {
             return player.teleport(location, TeleportCause.COMMAND);
         }
         return false;
-    }
-    
-    public void unfreezePlayer(String player) {
-        this.frozenPlayers.remove(player);
     }
     
     public int getCardinalDirection(Player player) {
@@ -402,19 +391,23 @@ public class PlayerObject {
     }
     
     public boolean isHelmetArmor(Material mat) {
-        return (mat == Material.LEATHER_HELMET || mat == Material.CHAINMAIL_HELMET || mat == Material.IRON_HELMET || mat == Material.GOLD_HELMET || mat == Material.DIAMOND_HELMET);
+        return (mat == Material.LEATHER_HELMET || mat == Material.CHAINMAIL_HELMET || mat == Material.IRON_HELMET
+                || mat == Material.GOLD_HELMET || mat == Material.DIAMOND_HELMET);
     }
     
     public boolean isChestplateArmor(Material mat) {
-        return (mat == Material.LEATHER_CHESTPLATE || mat == Material.CHAINMAIL_CHESTPLATE || mat == Material.IRON_CHESTPLATE || mat == Material.GOLD_CHESTPLATE || mat == Material.DIAMOND_CHESTPLATE);
+        return (mat == Material.LEATHER_CHESTPLATE || mat == Material.CHAINMAIL_CHESTPLATE || mat == Material.IRON_CHESTPLATE
+                || mat == Material.GOLD_CHESTPLATE || mat == Material.DIAMOND_CHESTPLATE);
     }
     
     public boolean isLeggingArmor(Material mat) {
-        return (mat == Material.LEATHER_LEGGINGS || mat == Material.CHAINMAIL_LEGGINGS || mat == Material.IRON_LEGGINGS || mat == Material.GOLD_LEGGINGS || mat == Material.DIAMOND_LEGGINGS);
+        return (mat == Material.LEATHER_LEGGINGS || mat == Material.CHAINMAIL_LEGGINGS || mat == Material.IRON_LEGGINGS
+                || mat == Material.GOLD_LEGGINGS || mat == Material.DIAMOND_LEGGINGS);
     }
     
     public boolean isBootArmor(Material mat) {
-        return (mat == Material.LEATHER_BOOTS || mat == Material.CHAINMAIL_BOOTS || mat == Material.IRON_BOOTS || mat == Material.GOLD_BOOTS || mat == Material.DIAMOND_BOOTS);
+        return (mat == Material.LEATHER_BOOTS || mat == Material.CHAINMAIL_BOOTS || mat == Material.IRON_BOOTS
+                || mat == Material.GOLD_BOOTS || mat == Material.DIAMOND_BOOTS);
     }
     
     public boolean isArmour(Material mat) {

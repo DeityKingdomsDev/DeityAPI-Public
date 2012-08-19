@@ -116,8 +116,11 @@ public class Database {
      * @return
      */
     private String getConnectionString() {
-        return "jdbc:mysql://" + DeityAPI.plugin.config.getString(DeityAPIConfigHelper.MYSQL_SERVER_ADDRESS) + ":" + DeityAPI.plugin.config.getInt(DeityAPIConfigHelper.MYSQL_SERVER_PORT) + "/" + DeityAPI.plugin.config.getString(DeityAPIConfigHelper.MYSQL_DATABASE_NAME) + "?user="
-                + DeityAPI.plugin.config.getString(DeityAPIConfigHelper.MYSQL_DATABASE_USERNAME) + "&password=" + DeityAPI.plugin.config.getString(DeityAPIConfigHelper.MYSQL_DATABASE_PASSWORD);
+        return "jdbc:mysql://" + DeityAPI.plugin.config.getString(DeityAPIConfigHelper.MYSQL_SERVER_ADDRESS) + ":"
+                + DeityAPI.plugin.config.getInt(DeityAPIConfigHelper.MYSQL_SERVER_PORT) + "/"
+                + DeityAPI.plugin.config.getString(DeityAPIConfigHelper.MYSQL_DATABASE_NAME) + "?user="
+                + DeityAPI.plugin.config.getString(DeityAPIConfigHelper.MYSQL_DATABASE_USERNAME) + "&password="
+                + DeityAPI.plugin.config.getString(DeityAPIConfigHelper.MYSQL_DATABASE_PASSWORD);
     }
     
     /**
@@ -260,7 +263,8 @@ public class Database {
      * @return
      */
     public String tableName(String prefix, String nameOfTable) {
-        return (String.format("`%s`.`%s`", DeityAPI.plugin.config.getString(DeityAPIConfigHelper.MYSQL_DATABASE_NAME), prefix + nameOfTable));
+        return (String.format("`%s`.`%s`", DeityAPI.plugin.config.getString(DeityAPIConfigHelper.MYSQL_DATABASE_NAME), prefix
+                + nameOfTable));
     }
     
     /**
